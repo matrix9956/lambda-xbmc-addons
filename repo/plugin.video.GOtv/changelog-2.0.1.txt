@@ -1,4 +1,14 @@
 ------------------------
+GOtv v2.0.1 (21-Apr-14)
+------------------------
+
+- Fixed issues with Icefilms source.
+- Fixed issues with Noobroom source.
+- Tweaked season and episode listings.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.0.0 (20-Apr-14)
 ------------------------
 

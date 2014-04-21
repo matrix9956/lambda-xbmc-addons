@@ -1963,17 +1963,10 @@ class seasons:
             [i.start() for i in threads]
             [i.join() for i in threads]
 
-            if self.list == None: self.list = []
-            if self.list2 == None: self.list2 = []
-
-            if len(self.list) == 0:
-                return self.list2
-            elif len(self.list2) > len(self.list):
-                return self.list2
-            elif any(len(i['season']) > 3 for i in self.list):
-                return self.list2
-            elif len(self.list) > 0:
+            if self.list2 == None or self.list2 == []:
                 return self.list
+            else:
+                return self.list2
         except:
             return
 
@@ -2123,6 +2116,7 @@ class episodes:
             result = getUrl(url).result
             episodes = common.parseDOM(result, "Season", attrs = { "no": season })[0]
             episodes = common.parseDOM(episodes, "episode")
+            episodes = [i for i in episodes if not common.parseDOM(i, "seasonnum")[0] == '00']
             episodes = [i for i in episodes if not common.parseDOM(i, "seasonnum")[0] == '0']
         except:
             return
@@ -2151,11 +2145,7 @@ class episodes:
                 thumb = common.replaceHTMLCodes(thumb)
                 thumb = thumb.encode('utf-8')
 
-                desc = plot
-                desc = common.replaceHTMLCodes(desc)
-                desc = desc.encode('utf-8')
-
-                self.list.append({'name': name, 'url': name, 'image': thumb, 'date': date, 'year': year, 'imdb': imdb, 'tvdb': tvdb, 'genre': genre, 'plot': desc, 'title': title, 'show': show, 'show_alt': show_alt, 'season': season, 'episode': num, 'sort': '%10d' % int(num)})
+                self.list.append({'name': name, 'url': name, 'image': thumb, 'date': date, 'year': year, 'imdb': imdb, 'tvdb': tvdb, 'genre': genre, 'plot': plot, 'title': title, 'show': show, 'show_alt': show_alt, 'season': season, 'episode': num, 'sort': '%10d' % int(num)})
             except:
                 pass
 
@@ -2430,7 +2420,8 @@ class icefilms:
 
             result = getUrl(url).result
             result = result.decode('iso-8859-1').encode('utf-8')
-            id = re.compile('.*href=/ip.php[?]v=(.+?)&>%01dx%02d' % (int(season), int(episode))).findall(result)[0]
+            id = re.compile('href=/ip.php[?]v=(.+?)&>%01dx%02d' % (int(season), int(episode))).findall(result)[0]
+            id = id.split('v=')[-1]
             url = self.video_link % id
             url = common.replaceHTMLCodes(url)
             url = url.encode('utf-8')
@@ -3048,9 +3039,7 @@ class noobroom:
             global noobroom_sources
             noobroom_sources = []
 
-            query = self.search_link % (urllib.quote_plus(show))
             if (self.mail == '' or self.password == ''): raise Exception()
-            post = urllib.urlencode({'email': self.mail, 'password': self.password})
 
             search = 'http://www.imdbapi.com/?i=tt%s' % imdb
             search = getUrl(search).result
@@ -3058,9 +3047,9 @@ class noobroom:
             country = search['Country']
             if not 'USA' in country: return
 
-            result = getUrl(self.login_link, close=False).result
-            result = urllib2.Request(self.login2_link, post)
-            result = urllib2.urlopen(result, timeout=10)
+            query = self.search_link % (urllib.quote_plus(show))
+
+            result = self.login()
             result = getUrl(query).result
 
             url = re.compile('(<i>TV Series</i>.+)').findall(result)[0]
@@ -3078,8 +3067,12 @@ class noobroom:
             url = url.encode('utf-8')
 
             result = getUrl(url).result
-            url = re.compile('"file": "(.+?)"').findall(result)[0]
-            url = '%s%s' % (self.base_link, url)
+            links = re.compile('"file": "(.+?)"').findall(result)
+            try: u = [i for i in links if 'type=flv' in i][0]
+            except: pass
+            try: u = [i for i in links if 'type=mp4' in i][0]
+            except: pass
+            url = '%s%s' % (self.base_link, u)
             url = common.replaceHTMLCodes(url)
             url = url.encode('utf-8')
 
@@ -3094,14 +3087,27 @@ class noobroom:
         except:
             return
 
+    def login(self):
+        try:
+            post = urllib.urlencode({'email': self.mail, 'password': self.password})
+            result = getUrl(self.login_link, close=False).result
+            result = urllib2.Request(self.login2_link, post)
+            result = urllib2.urlopen(result, timeout=10)
+        except:
+            return
+
     def cleantitle(self, title):
         title = re.sub('\n|\s(|[(])(UK|US|AU)(|[)])$|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
         return title
 
     def resolve(self, url):
         try:
-            url = getUrl(url, output='geturl').result
-            return url
+            result = self.login()
+            try: u = getUrl(url, output='geturl').result
+            except: pass
+            try: u = getUrl(url.replace('&hd=0', '&hd=1'), output='geturl').result
+            except: pass
+            return u
         except:
             return
 
