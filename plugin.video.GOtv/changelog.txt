@@ -1,4 +1,14 @@
 ------------------------
+GOtv v2.0.2 (21-Apr-14)
+------------------------
+
+- Tweaked VKBox source.
+- Tweaked Putlocker TV source.
+- Tweaked Noobroom source.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.0.1 (21-Apr-14)
 ------------------------
 

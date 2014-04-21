@@ -2706,7 +2706,7 @@ class putlockertv:
             search = getUrl(search).result
             search = json.loads(search)
             country = search['Country']
-            if not 'USA' in country: return
+            if 'UK,' in country or ', UK' in country: return
 
             result = getUrl(self.base_link).result
             result = common.parseDOM(result, "tr", attrs = { "class": "fc" })
@@ -2799,7 +2799,7 @@ class vkbox:
             search = getUrl(search).result
             search = json.loads(search)
             country = search['Country']
-            if not 'USA' in country: return
+            if 'UK,' in country or ', UK' in country: return
 
             result = self.getdata()
             #result = cache2(self.getdata)
@@ -3045,7 +3045,7 @@ class noobroom:
             search = getUrl(search).result
             search = json.loads(search)
             country = search['Country']
-            if not 'USA' in country: return
+            if 'UK,' in country or ', UK' in country: return
 
             query = self.search_link % (urllib.quote_plus(show))
 
