@@ -94,6 +94,7 @@ class main:
         except:     imdb = None
 
         if action == None:                          root().get()
+        elif action == 'root_search':               root().search()
         elif action == 'item_play':                 contextMenu().item_play()
         elif action == 'item_random_play':          contextMenu().item_random_play()
         elif action == 'item_queue':                contextMenu().item_queue()
@@ -113,19 +114,18 @@ class main:
         elif action == 'download':                  contextMenu().download(name, url)
         elif action == 'trailer':                   contextMenu().trailer(name, url)
         elif action == 'movies':                    movies().get(url)
-        elif action == 'movies2':                   movies().gethd(url)
-        elif action == 'movies_added':              movies().viooz_added()
-        elif action == 'movies_hd':                 movies().viooz_hd()
-        elif action == 'movies_cinema':             movies().viooz_cinema()
-        elif action == 'movies_views':              movies().viooz_views()
-        elif action == 'movies_actor':              movies().viooz_actor(query)
-        elif action == 'movies_search':             movies().viooz_search(query)
+        elif action == 'movies_added':              movies().added()
+        elif action == 'movies_cinema':             movies().cinema()
+        elif action == 'movies_views':              movies().views()
+        elif action == 'movies_search':             movies().search(query)
+        elif action == 'movies_actors_search':      movies().actors_search(query)
+        elif action == 'movies_directors_search':   movies().directors_search(query)
         elif action == 'movies_favourites':         favourites().movies()
-        elif action == 'pages_movies':              pages().viooz()
-        elif action == 'genres_movies':             genres().viooz()
-        elif action == 'years_movies':              years().viooz()
-        elif action == 'years_countries':           countries().viooz()
-        elif action == 'languages_movies':          languages().viooz()
+        elif action == 'pages_movies':              pages().get()
+        elif action == 'genres_movies':             genres().get()
+        elif action == 'years_movies':              years().get()
+        elif action == 'countries_movies':          countries().get()
+        elif action == 'languages_movies':          languages().get()
         elif action == 'play':                      resolver().run(url, name)
 
         if action is None:
@@ -220,7 +220,7 @@ class player(xbmc.Player):
             item.setInfo( type="Video", infoLabels= meta )
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-        for i in range(1, 21):
+        for i in range(0, 250):
             try: self.totalTime = self.getTotalTime()
             except: self.totalTime = 0
             if not self.totalTime == 0: continue
@@ -241,10 +241,25 @@ class player(xbmc.Player):
         self.imdb = re.sub('[^0-9]', '', imdb)
         self.subtitle = subtitles().get(self.name, self.imdb, '', '')
 
+    def container_refresh(self):
+        try:
+            params = {}
+            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
+            for i in query: params[i.split('=')[0]] = i.split('=')[1]
+            if not params["action"].endswith('_search'): index().container_refresh()
+        except:
+            pass
+
     def offset_add(self):
         try:
-            file = open(offData, 'a+')
-            file.write('"%s"|"%s"|"%s"\n' % (self.name, self.imdb, self.currentTime))
+            file = xbmcvfs.File(offData)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"' % (self.name, self.imdb, self.currentTime))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -254,10 +269,11 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(offData, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (self.name, self.imdb) in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -268,8 +284,8 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(line)[0]
+            read = [i for i in read.splitlines(True) if '"%s"|"%s"|"' % (self.name, self.imdb) in i][0]
+            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(read)[0]
         except:
             return
 
@@ -278,15 +294,6 @@ class player(xbmc.Player):
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": {"movieid" : %s, "playcount" : 1 }, "id": 1 }' % str(self.meta['movieid']))
         except:
             metaget.change_watched(self.content, '', self.imdb, season='', episode='', year='', watched=7)
-
-    def container_refresh(self):
-        try:
-            params = {}
-            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
-            for i in query: params[i.split('=')[0]] = i.split('=')[1]
-            if not params["action"].endswith('_search'): index().container_refresh()
-        except:
-            pass
 
     def resume_playback(self):
         offset = float(self.offset)
@@ -486,21 +493,6 @@ class index:
         item.addContextMenuItems([], replaceItems=False)
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=item,isFolder=True)
 
-    def nextList2(self, nextList):
-        try: next = nextList[0]['next']
-        except: return
-        if next == '': return
-        name, url, image = language(30361).encode("utf-8"), next, addonNext
-        sysurl = urllib.quote_plus(url)
-
-        u = '%s?action=movies2&url=%s' % (sys.argv[0], sysurl)
-
-        item = xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=image)
-        item.setInfo( type="Video", infoLabels={ "Label": name, "Title": name, "Plot": addonDesc } )
-        item.setProperty("Fanart_Image", addonFanart)
-        item.addContextMenuItems([], replaceItems=False)
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=item,isFolder=True)
-
     def downloadList(self):
         u = getSetting("downloads")
         if u == '': return
@@ -559,7 +551,7 @@ class index:
                     if getSetting("fav_sort") == '2': cm.append((language(30419).encode("utf-8"), 'RunPlugin(%s?action=favourite_moveUp&name=%s&url=%s)' % (sys.argv[0], sysname, sysurl)))
                     if getSetting("fav_sort") == '2': cm.append((language(30420).encode("utf-8"), 'RunPlugin(%s?action=favourite_moveDown&name=%s&url=%s)' % (sys.argv[0], sysname, sysurl)))
                     cm.append((language(30421).encode("utf-8"), 'RunPlugin(%s?action=favourite_delete&name=%s&url=%s)' % (sys.argv[0], sysname, sysurl)))
-                elif action == 'movies_search' or action == 'movies_actor':
+                elif action.endswith('_search'):
                     cm.append((language(30416).encode("utf-8"), 'RunPlugin(%s?action=trailer&name=%s&url=%s)' % (sys.argv[0], sysname, trailer)))
                     cm.append((language(30422).encode("utf-8"), 'RunPlugin(%s?action=library&name=%s&url=%s)' % (sys.argv[0], sysname, sysurl)))
                     cm.append((language(30417).encode("utf-8"), 'RunPlugin(%s?action=favourite_from_search&name=%s&imdb=%s&url=%s&image=%s)' % (sys.argv[0], sysname, sysimdb, sysurl, sysimage)))
@@ -638,10 +630,12 @@ class contextMenu:
             file = xbmcvfs.File(viewData)
             read = file.read()
             file.close()
-            file = open(viewData, 'w')
-            for line in re.compile('(".+?\n)').findall(read):
-                if not line.startswith('"%s"|"%s"|"' % (skin, content)): file.write(line)
-            file.write('"%s"|"%s"|"%s"\n' % (skin, content, str(view)))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (skin, content) in i]
+            write.append('"%s"|"%s"|"%s"' % (skin, content, str(view)))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(viewData, 'w')
+            file.write(str(write))
             file.close()
             viewName = xbmc.getInfoLabel('Container.Viewmode')
             index().infoDialog('%s%s%s' % (language(30301).encode("utf-8"), viewName, language(30302).encode("utf-8")))
@@ -651,8 +645,14 @@ class contextMenu:
     def favourite_add(self, data, name, url, image, imdb):
         try:
             index().container_refresh()
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            file = xbmcvfs.File(data)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -663,11 +663,14 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            if url in read:
+            if '"%s"' % url in read:
                 index().infoDialog(language(30307).encode("utf-8"), name)
                 return
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -679,10 +682,11 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(data, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"' % url in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30304).encode("utf-8"), name)
         except:
@@ -694,13 +698,13 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
             if i == 0 : return
-            list[i], list[i-1] = list[i-1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write[i], write[i-1] = write[i-1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30305).encode("utf-8"), name)
         except:
@@ -712,13 +716,13 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
-            if i+1 == len(list): return
-            list[i], list[i+1] = list[i+1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
+            if i+1 == len(write): return
+            write[i], write[i+1] = write[i+1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30306).encode("utf-8"), name)
         except:
@@ -929,19 +933,24 @@ class root:
     def get(self):
         rootList = []
         rootList.append({'name': 30501, 'image': 'Added.png', 'action': 'movies_added'})
-        rootList.append({'name': 30502, 'image': 'HD.png', 'action': 'movies_hd'})
-        rootList.append({'name': 30503, 'image': 'Cinema.png', 'action': 'movies_cinema'})
-        rootList.append({'name': 30504, 'image': 'Views.png', 'action': 'movies_views'})
-        rootList.append({'name': 30505, 'image': 'Pages.png', 'action': 'pages_movies'})
-        rootList.append({'name': 30506, 'image': 'Genres.png', 'action': 'genres_movies'})
-        rootList.append({'name': 30507, 'image': 'Years.png', 'action': 'years_movies'})
-        rootList.append({'name': 30508, 'image': 'Countries.png', 'action': 'years_countries'})
-        rootList.append({'name': 30509, 'image': 'Languages.png', 'action': 'languages_movies'})
-        rootList.append({'name': 30510, 'image': 'Favourites.png', 'action': 'movies_favourites'})
-        rootList.append({'name': 30511, 'image': 'Actors.png', 'action': 'movies_actor'})
-        rootList.append({'name': 30512, 'image': 'Search.png', 'action': 'movies_search'})
+        rootList.append({'name': 30502, 'image': 'Cinema.png', 'action': 'movies_cinema'})
+        rootList.append({'name': 30503, 'image': 'Views.png', 'action': 'movies_views'})
+        rootList.append({'name': 30504, 'image': 'Pages.png', 'action': 'pages_movies'})
+        rootList.append({'name': 30505, 'image': 'Genres.png', 'action': 'genres_movies'})
+        rootList.append({'name': 30506, 'image': 'Years.png', 'action': 'years_movies'})
+        rootList.append({'name': 30507, 'image': 'Countries.png', 'action': 'countries_movies'})
+        rootList.append({'name': 30508, 'image': 'Languages.png', 'action': 'languages_movies'})
+        rootList.append({'name': 30509, 'image': 'Favourites.png', 'action': 'movies_favourites'})
+        rootList.append({'name': 30510, 'image': 'Search.png', 'action': 'root_search'})
         index().rootList(rootList)
         index().downloadList()
+
+    def search(self):
+        rootList = []
+        rootList.append({'name': 30521, 'image': 'Movies.png', 'action': 'movies_search'})
+        rootList.append({'name': 30522, 'image': 'Actors.png', 'action': 'movies_actors_search'})
+        rootList.append({'name': 30523, 'image': 'Directors.png', 'action': 'movies_directors_search'})
+        index().rootList(rootList)
 
 class link:
     def __init__(self):
@@ -952,6 +961,7 @@ class link:
         self.viooz_views = 'http://viooz.co/top/'
         self.viooz_search = 'http://viooz.co/search?s=t&q=%s'
         self.viooz_actor = 'http://viooz.co/search?s=a&q=%s'
+        self.viooz_director = 'http://viooz.co/search?s=d&q=%s'
         self.viooz_pages = 'http://viooz.co/movies/'
         self.viooz_genres = 'http://viooz.co/genre/'
         self.viooz_years = 'http://viooz.co/year/'
@@ -970,7 +980,7 @@ class pages:
     def __init__(self):
         self.list = []
 
-    def viooz(self):
+    def get(self):
         #self.list = self.viooz_list()
         self.list = cache3(self.viooz_list)
         index().pageList(self.list)
@@ -1009,7 +1019,7 @@ class genres:
     def __init__(self):
         self.list = []
 
-    def viooz(self):
+    def get(self):
         #self.list = self.viooz_list()
         self.list = cache3(self.viooz_list)
         self.list = sorted(self.list, key=itemgetter('name'))
@@ -1049,7 +1059,7 @@ class years:
     def __init__(self):
         self.list = []
 
-    def viooz(self):
+    def get(self):
         #self.list = self.viooz_list()
         self.list = cache2(self.viooz_list)
         self.list = self.list[::-1]
@@ -1089,7 +1099,7 @@ class countries:
     def __init__(self):
         self.list = []
 
-    def viooz(self):
+    def get(self):
         #self.list = self.viooz_list()
         self.list = cache2(self.viooz_list)
         self.list = sorted(self.list, key=itemgetter('name'))
@@ -1129,7 +1139,7 @@ class languages:
     def __init__(self):
         self.list = []
 
-    def viooz(self):
+    def get(self):
         #self.list = self.viooz_list()
         self.list = cache2(self.viooz_list)
         self.list = sorted(self.list, key=itemgetter('name'))
@@ -1175,39 +1185,35 @@ class movies:
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def gethd(self, url):
-        #self.list = self.viooz_list(url)
-        self.list = cache(self.viooz_list, url)
-        self.list = [i for i in self.list if i['quality'] == 'HD']
-        index().movieList(self.list)
-        index().nextList2(self.list)
-
-    def viooz_added(self):
+    def added(self):
         #self.list = self.viooz_list(link().viooz_added)
         self.list = cache(self.viooz_list, link().viooz_added)
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def viooz_hd(self):
-        #self.list = self.viooz_list(link().viooz_added)
-        self.list = cache(self.viooz_list, link().viooz_added)
-        self.list = [i for i in self.list if i['quality'] == 'HD']
-        index().movieList(self.list)
-        index().nextList2(self.list)
-
-    def viooz_cinema(self):
+    def cinema(self):
         #self.list = self.viooz_list(link().viooz_cinema)
         self.list = cache(self.viooz_list, link().viooz_cinema)
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def viooz_views(self):
+    def views(self):
         #self.list = self.viooz_list(link().viooz_views)
         self.list = cache(self.viooz_list, link().viooz_views)
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def viooz_actor(self, query=None):
+    def search(self, query=None):
+        if query is None:
+            self.query = common.getUserInput(language(30362).encode("utf-8"), '')
+        else:
+            self.query = query
+        if not (self.query is None or self.query == ''):
+            self.query = link().viooz_search % urllib.quote_plus(self.query)
+            self.list = self.viooz_list(self.query)
+            index().movieList(self.list)
+
+    def actors_search(self, query=None):
         if query is None:
             self.query = common.getUserInput(language(30362).encode("utf-8"), '')
         else:
@@ -1218,15 +1224,16 @@ class movies:
             index().movieList(self.list)
             index().nextList(self.list)
 
-    def viooz_search(self, query=None):
+    def directors_search(self, query=None):
         if query is None:
             self.query = common.getUserInput(language(30362).encode("utf-8"), '')
         else:
             self.query = query
         if not (self.query is None or self.query == ''):
-            self.query = link().viooz_search % urllib.quote_plus(self.query)
+            self.query = link().viooz_director % urllib.quote_plus(self.query)
             self.list = self.viooz_list(self.query)
             index().movieList(self.list)
+            index().nextList(self.list)
 
     def viooz_list(self, url):
         try:
@@ -1394,46 +1401,31 @@ class resolver:
 
     def viooz(self, url):
         try:
-            import decrypter
+            result = ''
             result = getUrl(url, timeout='30').result
             if not '"menu_categorie"' in result: result = proxy().result(url)
 
-            url = re.compile('proxy[.]link=viooz[*](.+?)&').findall(result)[0]
-            url = common.replaceHTMLCodes(url)
-            url = decrypter.decrypter(198,128).decrypt(url,base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='),'ECB').split('\0')[0]
+            try:
+                url = common.parseDOM(result, "source", ret="src", attrs = { "type": "video/.+?" })[0]
+                url = proxy().redirect(url)
+                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
+                url = common.replaceHTMLCodes(url)
+            except:
+                import decrypter
+                url = re.compile('proxy[.]link=viooz[*](.+?)&').findall(result)[0]
+                url = common.replaceHTMLCodes(url)
+                url = decrypter.decrypter(198,128).decrypt(url,base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='),'ECB').split('\0')[0]
 
-            if '/yify.tv/' in url: return self.yify(url)
+                result = getUrl(url).result
+                url = common.parseDOM(result, "link", ret="href", attrs = { "rel": "alternate" })[0]
+                url = common.replaceHTMLCodes(url)
 
-            result = getUrl(url).result
-            url = common.parseDOM(result, "link", ret="href", attrs = { "rel": "alternate" })[0]
-            url = common.replaceHTMLCodes(url)
-
-            result = getUrl(url).result
-            url = common.parseDOM(result, "media:content", ret="url")
-            url = [common.replaceHTMLCodes(i) for i in url]
-            url = [i for i in url if 'videoplayback?' in i]
-            try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-            except: url = url[-1]
-
-            url = getUrl(url, output='geturl').result
-            if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
-            else: url = url.replace('https://', 'http://')
-            return url
-        except:
-            return
-
-    def yify(self, url):
-        try:
-            result = getUrl(url).result
-            url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
-            url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p.php?url=' + url
-
-            result = getUrl(url).result
-            url = re.compile('"url":"(.+?)"').findall(result)
-            url = [common.replaceHTMLCodes(i) for i in url]
-            url = [i for i in url if 'videoplayback?' in i]
-            try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-            except: url = url[-1]
+                result = getUrl(url).result
+                url = common.parseDOM(result, "media:content", ret="url")
+                url = [common.replaceHTMLCodes(i) for i in url]
+                url = [i for i in url if 'videoplayback?' in i]
+                try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
+                except: url = url[-1]
 
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')

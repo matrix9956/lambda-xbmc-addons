@@ -105,15 +105,16 @@
 	<string id="30450">Bekijk Speelfilms vanaf viooz.co</string>
 	<!-- Labels -->
 	<string id="30501">Datum toegevoegd</string>
-	<string id="30502">HD-films</string>
-	<string id="30503">Cinema</string>
-	<string id="30504">Bekeken</string>
-	<string id="30505">Pagina's</string>
-	<string id="30506">Genres</string>
-	<string id="30507">Years</string>
-	<string id="30508">Landen</string>
-	<string id="30509">Talen</string>
-	<string id="30510">Favorieten</string>
-	<string id="30511">Acteurs</string>
-	<string id="30512">Zoeken</string>
+	<string id="30502">Cinema</string>
+	<string id="30503">Bekeken</string>
+	<string id="30504">Pagina's</string>
+	<string id="30505">Genres</string>
+	<string id="30506">Years</string>
+	<string id="30507">Landen</string>
+	<string id="30508">Talen</string>
+	<string id="30509">Favorieten</string>
+	<string id="30510">Zoeken</string>
+	<string id="30521">Speelfilms</string>
+	<string id="30522">Acteurs</string>
+	<string id="30523">Regisseurs</string>
 </strings>

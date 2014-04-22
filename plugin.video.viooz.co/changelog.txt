@@ -1,4 +1,18 @@
 ------------------------
+Viooz v1.3.0 (22-Apr-14)
+------------------------
+
+- Fixed issues with resolver.
+- Added full remote share support.
+- Removed HD Movies section.
+- Added search by director.
+- Tweaked search sections.
+- Tweaked all listings.
+- Tweaked context menus.
+- Code cosmetics.
+
+
+------------------------
 Viooz v1.2.0 (30-Mar-14)
 ------------------------
 

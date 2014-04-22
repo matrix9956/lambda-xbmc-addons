@@ -105,15 +105,16 @@
 	<string id="30450">Une sélection de Films en Version Originale (Anglais)</string>
 	<!-- Labels -->
 	<string id="30501">Les plus récents</string>
-	<string id="30502">Films en HD</string>
-	<string id="30503">Cinéma</string>
-	<string id="30504">Les Plus Vues</string>
-	<string id="30505">Par Pages</string>
-	<string id="30506">Par Genres</string>
-	<string id="30507">Par Année</string>
-	<string id="30508">Par Pays</string>
-	<string id="30509">Par Langues</string>
-	<string id="30510">Mes Favoris</string>
-	<string id="30511">Acteurs</string>
-	<string id="30512">Recherche</string>
+	<string id="30502">Cinéma</string>
+	<string id="30503">Les Plus Vues</string>
+	<string id="30504">Par Pages</string>
+	<string id="30505">Par Genres</string>
+	<string id="30506">Par Année</string>
+	<string id="30507">Par Pays</string>
+	<string id="30508">Par Langues</string>
+	<string id="30509">Mes Favoris</string>
+	<string id="30510">Recherche</string>
+	<string id="30521">Films</string>
+	<string id="30522">Acteurs</string>
+	<string id="30523">Réalisateurs</string>
 </strings>

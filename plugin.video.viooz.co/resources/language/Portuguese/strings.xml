@@ -105,15 +105,16 @@
 	<string id="30450">Assistir a uma vasta selecção de filmes do site viooz.co</string>
 	<!-- Labels -->
 	<string id="30501">Adicionado</string>
-	<string id="30502">Filmes HD</string>
-	<string id="30503">Cinema</string>
-	<string id="30504">Vistas</string>
-	<string id="30505">Páginas</string>
-	<string id="30506">Géneros</string>
-	<string id="30507">Anos</string>
-	<string id="30508">Países</string>
-	<string id="30509">Idiomas</string>
-	<string id="30510">Favoritos</string>
-	<string id="30511">Actores</string>
-	<string id="30512">Procurar</string>
+	<string id="30502">Cinema</string>
+	<string id="30503">Vistas</string>
+	<string id="30504">Páginas</string>
+	<string id="30505">Géneros</string>
+	<string id="30506">Anos</string>
+	<string id="30507">Países</string>
+	<string id="30508">Idiomas</string>
+	<string id="30509">Favoritos</string>
+	<string id="30510">Procurar</string>
+	<string id="30521">Filmes</string>
+	<string id="30522">Actores</string>
+	<string id="30523">Realizadores</string>
 </strings>

@@ -105,15 +105,16 @@
 	<string id="30450">Watch a wide selection of movies from viooz.co</string>
 	<!-- Labels -->
 	<string id="30501">Added</string>
-	<string id="30502">HD Movies</string>
-	<string id="30503">Cinema</string>
-	<string id="30504">Views</string>
-	<string id="30505">Pages</string>
-	<string id="30506">Genres</string>
-	<string id="30507">Years</string>
-	<string id="30508">Countries</string>
-	<string id="30509">Languages</string>
-	<string id="30510">Favourites</string>
-	<string id="30511">Actors</string>
-	<string id="30512">Search</string>
+	<string id="30502">Cinema</string>
+	<string id="30503">Views</string>
+	<string id="30504">Pages</string>
+	<string id="30505">Genres</string>
+	<string id="30506">Years</string>
+	<string id="30507">Countries</string>
+	<string id="30508">Languages</string>
+	<string id="30509">Favourites</string>
+	<string id="30510">Search</string>
+	<string id="30521">Movies</string>
+	<string id="30522">Actors</string>
+	<string id="30523">Directors</string>
 </strings>

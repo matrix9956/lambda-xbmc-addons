@@ -105,15 +105,16 @@
 	<string id="30450">Urmărește filme de viooz.co</string>
 	<!-- Labels -->
 	<string id="30501">Data adăugării</string>
-	<string id="30502">Filme HD</string>
-	<string id="30503">Cinema</string>
-	<string id="30504">Vizualizări</string>
-	<string id="30505">Pagini</string>
-	<string id="30506">Genuri</string>
-	<string id="30507">Ani</string>
-	<string id="30508">Țări</string>
-	<string id="30509">Limbi</string>
-	<string id="30510">Favorite</string>
-	<string id="30511">Actori</string>
-	<string id="30512">Caută</string>
+	<string id="30502">Cinema</string>
+	<string id="30503">Vizualizări</string>
+	<string id="30504">Pagini</string>
+	<string id="30505">Genuri</string>
+	<string id="30506">Ani</string>
+	<string id="30507">Țări</string>
+	<string id="30508">Limbi</string>
+	<string id="30509">Favorite</string>
+	<string id="30510">Caută</string>
+	<string id="30521">Filme</string>
+	<string id="30522">Actori</string>
+	<string id="30523">Regizori</string>
 </strings>

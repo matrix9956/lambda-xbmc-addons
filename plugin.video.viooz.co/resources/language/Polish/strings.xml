@@ -105,15 +105,16 @@
 	<string id="30450">Oglądaj filmy z viooz.co</string>
 	<!-- Labels -->
 	<string id="30501">Data dodania</string>
-	<string id="30502">Filmy HD</string>
-	<string id="30503">Kino</string>
-	<string id="30504">Najczęściej Oglądane</string>
-	<string id="30505">Strony</string>
-	<string id="30506">Gatunki</string>
-	<string id="30507">Rok Produkcji</string>
-	<string id="30508">Kraje</string>
-	<string id="30509">Wybór języka</string>
-	<string id="30510">Ulubione</string>
-	<string id="30511">Obsada</string>
-	<string id="30512">Szukaj</string>
+	<string id="30502">Kino</string>
+	<string id="30503">Najczęściej Oglądane</string>
+	<string id="30504">Strony</string>
+	<string id="30505">Gatunki</string>
+	<string id="30506">Rok Produkcji</string>
+	<string id="30507">Kraje</string>
+	<string id="30508">Wybór języka</string>
+	<string id="30509">Ulubione</string>
+	<string id="30510">Szukaj</string>
+	<string id="30521">Filmy</string>
+	<string id="30522">Obsada</string>
+	<string id="30523">Reżyseria</string>
 </strings>
