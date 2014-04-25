@@ -146,10 +146,10 @@
 	<string id="30521">Films</string>
 	<string id="30522">Acteurs</string>
 	<string id="30531">Watch-List</string>
-	<string id="30532">Watch-Added</string>
-	<string id="30533">Watch-Title</string>
+	<string id="30532">Collection</string>
+	<string id="30533">Vues</string>
+	<string id="30534">Intérêt</string>
 	<string id="30541">Watch-List</string>
-	<string id="30542">Collection</string>
-	<string id="30543">Vues</string>
-	<string id="30544">Intérêt</string>
+	<string id="30542">Watch-Added</string>
+	<string id="30543">Watch-Title</string>
 </strings>

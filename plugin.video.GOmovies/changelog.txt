@@ -1,4 +1,18 @@
 ------------------------
+GOmovies v2.0.1 (26-Apr-14)
+------------------------
+
+- Fixed issues with Trakt lists.
+- Fixed issues with istreamHD source.
+- Fixed issues with Noobroom source.
+- Tweaked Viooz source.
+- Tweaked all listings.
+- Tweaked filtering of search.
+- Tweaked context menus.
+- Code cosmetics.
+
+
+------------------------
 GOmovies v2.0.0 (13-Apr-14)
 ------------------------
 
