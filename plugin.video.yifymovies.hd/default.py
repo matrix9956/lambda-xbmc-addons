@@ -1472,14 +1472,18 @@ class resolver:
 
     def yify(self, url):
         try:
-            result = getUrl(url, timeout='30').result
-            url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
-            url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p.php?url=' + url
-
+            referer = url
             result = getUrl(url).result
-            url = re.compile('"url":"(.+?)"').findall(result)
-            url = [common.replaceHTMLCodes(i) for i in url]
-            url = [i for i in url if 'videoplayback?' in i]
+            url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
+            url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p2.php?url=' + url
+
+            result = getUrl(url, referer=referer).result
+            links = re.compile('"url":"(.+?)"').findall(result)
+
+            url = [i for i in links if '/gs.video.tt/' in i]
+            if not url == []: return url[-1]
+
+            url = [i for i in links if 'videoplayback?' in i]
             try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
             except: url = url[-1]
 
