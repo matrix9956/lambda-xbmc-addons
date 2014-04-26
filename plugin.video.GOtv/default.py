@@ -1731,6 +1731,8 @@ class shows:
                 year = re.sub('[^0-9]', '', year)[:4]
                 year = year.encode('utf-8')
 
+                if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
+
                 url = common.parseDOM(show, "a", ret="href")[0]
                 url = '%s%s' % (link().imdb_base, url)
                 url = common.replaceHTMLCodes(url)
@@ -1790,6 +1792,8 @@ class shows:
                 year = re.sub("\n|[(]|[)]|\s", "", year)
                 year = year.encode('utf-8')
 
+                if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
+
                 url = common.parseDOM(show, "a", ret="href")[0]
                 url = re.findall('tt(\d*)', url, re.I)[0]
                 url = link().imdb_title % url
@@ -1837,6 +1841,8 @@ class shows:
                 year = show['extra']
                 year = re.sub('[^0-9]', '', year)[:4]
                 year = year.encode('utf-8')
+
+                if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 url = show['url']
                 url = '%s%s' % (link().imdb_base, url)
@@ -1888,6 +1894,8 @@ class shows:
                 year = show['year']
                 year = re.sub('[^0-9]', '', str(year))
                 year = year.encode('utf-8')
+
+                if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 imdb = show['imdb_id']
                 imdb = re.sub('[^0-9]', '', str(imdb))
@@ -1986,7 +1994,7 @@ class seasons:
                 date = common.parseDOM(season, "FirstAired")[0]
                 date = common.replaceHTMLCodes(date)
                 date = date.encode('utf-8')
-                if int(date.replace('-','')) + 1 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d")): raise Exception()
+                if int(re.sub('[^0-9]', '', str(date)) + '0000') + 10500 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d%H%M")): raise Exception()
 
                 num = common.parseDOM(season, "SeasonNumber")[0]
                 num = '%01d' % int(num)
@@ -2022,7 +2030,7 @@ class seasons:
                 date = common.parseDOM(result, "Season", attrs = { "no": season })[0]
                 date = common.parseDOM(date, "airdate")[0]
                 date = date.encode('utf-8')
-                if int(date.replace('-','')) + 1 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d")): raise Exception()
+                if int(re.sub('[^0-9]', '', str(date)) + '0000') + 10500 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d%H%M")): raise Exception()
 
                 num = '%01d' % int(season)
                 num = num.encode('utf-8')
@@ -2076,7 +2084,7 @@ class episodes:
                 date = common.parseDOM(episode, "FirstAired")[0]
                 date = common.replaceHTMLCodes(date)
                 date = date.encode('utf-8')
-                if int(date.replace('-','')) + 1 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d")): raise Exception()
+                if int(re.sub('[^0-9]', '', str(date)) + '0000') + 10500 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d%H%M")): raise Exception()
 
                 title = common.parseDOM(episode, "EpisodeName")[0]
                 title = common.replaceHTMLCodes(title)
@@ -2126,7 +2134,7 @@ class episodes:
                 date = common.parseDOM(episode, "airdate")[0]
                 date = common.replaceHTMLCodes(date)
                 date = date.encode('utf-8')
-                if int(date.replace('-','')) + 1 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d")): raise Exception()
+                if int(re.sub('[^0-9]', '', str(date)) + '0000') + 10500 > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y%m%d%H%M")): raise Exception()
 
                 title = common.parseDOM(episode, "title")[0]
                 title = common.replaceHTMLCodes(title)
@@ -2863,6 +2871,7 @@ class istreamhd:
         self.search_link = 'http://istreamhd.org/get/mini_search.php?&count=10&q=%s'
         self.embed_link = 'http://istreamhd.org/lib/get_embed.php?%s'
         self.key_link = base64.urlsafe_b64decode('bWFpbD1hMTU2NDMxMyU0MGRyZHJiLm5ldCZwYXNzd29yZD1hMTU2NDMxMw==')
+        self.signup_link = 'http://istreamhd.org/get/signup.php?p=signup'
         self.login_link = 'http://istreamhd.org/get/login.php?p=login'
 
     def get(self, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict):
@@ -2872,6 +2881,7 @@ class istreamhd:
 
             query = self.search_link % (urllib.quote_plus(show))
 
+            cookie = getUrl(self.signup_link, post=self.key_link).result
             cookie = getUrl(self.login_link, post=self.key_link, output='cookie').result
 
             result = getUrl(query, cookie=cookie).result
@@ -3091,6 +3101,7 @@ class noobroom:
         try:
             post = urllib.urlencode({'email': self.mail, 'password': self.password})
             result = getUrl(self.login_link, close=False).result
+            cookie = getUrl(self.login_link, output='cookie').result
             result = urllib2.Request(self.login2_link, post)
             result = urllib2.urlopen(result, timeout=10)
         except:

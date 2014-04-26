@@ -1,4 +1,14 @@
 ------------------------
+GOtv v2.0.3 (26-Apr-14)
+------------------------
+
+- Tweaked new episodes inclusion interval.
+- Tweaked tv show listings.
+- Fixed issues with Noobroom source.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.0.2 (21-Apr-14)
 ------------------------
 
