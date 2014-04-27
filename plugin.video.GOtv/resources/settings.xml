@@ -80,6 +80,9 @@
 		<setting type="lsep" label="Noobroom"/>
 		<setting id="noobroom_mail" type="text" label="30103" default=""/>
 		<setting id="noobroom_password" type="text" option="hidden" label="30102" default=""/>
+		<setting type="lsep" label="iStreamHD"/>
+		<setting id="istreamhd_mail" type="text" label="30103" default=""/>
+		<setting id="istreamhd_password" type="text" option="hidden" label="30102" default=""/>
 	</category>
 
 	<category label="30120">

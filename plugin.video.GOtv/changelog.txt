@@ -1,4 +1,16 @@
 ------------------------
+GOtv v2.0.4 (27-Apr-14)
+------------------------
+
+- Re-work of iStreamHD source.
+- NOTE: You will have to use your account, register at http://istreamhd.org.
+- Tweaked VKBox source.
+- Tweaked Putlocker TV source.
+- Tweaked Noobroom source.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.0.3 (26-Apr-14)
 ------------------------
 

@@ -2713,8 +2713,8 @@ class putlockertv:
             search = 'http://www.imdbapi.com/?i=tt%s' % imdb
             search = getUrl(search).result
             search = json.loads(search)
-            country = search['Country']
-            if 'UK,' in country or ', UK' in country: return
+            country = [i.strip() for i in search['Country'].split(',')]
+            if 'UK' in country and not 'USA' in country: return
 
             result = getUrl(self.base_link).result
             result = common.parseDOM(result, "tr", attrs = { "class": "fc" })
@@ -2806,8 +2806,8 @@ class vkbox:
             search = 'http://www.imdbapi.com/?i=tt%s' % imdb
             search = getUrl(search).result
             search = json.loads(search)
-            country = search['Country']
-            if 'UK,' in country or ', UK' in country: return
+            country = [i.strip() for i in search['Country'].split(',')]
+            if 'UK' in country and not 'USA' in country: return
 
             result = self.getdata()
             #result = cache2(self.getdata)
@@ -2867,48 +2867,41 @@ class vkbox:
 class istreamhd:
     def __init__(self):
         self.base_link = 'http://istreamhd.org'
-        self.get_link = 'http://istreamhd.org/get'
-        self.search_link = 'http://istreamhd.org/get/mini_search.php?&count=10&q=%s'
-        self.embed_link = 'http://istreamhd.org/lib/get_embed.php?%s'
-        self.key_link = base64.urlsafe_b64decode('bWFpbD1hMTU2NDMxMyU0MGRyZHJiLm5ldCZwYXNzd29yZD1hMTU2NDMxMw==')
-        self.signup_link = 'http://istreamhd.org/get/signup.php?p=signup'
-        self.login_link = 'http://istreamhd.org/get/login.php?p=login'
+        self.login_link = 'aHR0cDovL2lzdHJlYW1oZC5vcmcvYXBpL2F1dGhlbnRpY2F0ZS5waHA='
+        self.search_link = 'aHR0cDovL2lzdHJlYW1oZC5vcmcvYXBpL3NlYXJjaC5waHA='
+        self.show_link = 'aHR0cDovL2lzdHJlYW1oZC5vcmcvYXBpL2dldF9zaG93LnBocA=='
+        self.get_link = 'aHR0cDovL2lzdHJlYW1oZC5vcmcvYXBpL2dldF92aWRlby5waHA='
+        self.mail, self.password = getSetting("istreamhd_mail"), getSetting("istreamhd_password")
 
     def get(self, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict):
         try:
             global istreamhd_sources
             istreamhd_sources = []
 
-            query = self.search_link % (urllib.quote_plus(show))
+            if (self.mail == '' or self.password == ''): raise Exception()
 
-            cookie = getUrl(self.signup_link, post=self.key_link).result
-            cookie = getUrl(self.login_link, post=self.key_link, output='cookie').result
+            post = urllib.urlencode({'e-mail': self.mail, 'password': self.password})
+            result = getUrl(base64.urlsafe_b64decode(self.login_link), post=post).result
+            result = json.loads(result)
+            token = result['auth']['token']
 
-            result = getUrl(query, cookie=cookie).result
-            url = common.parseDOM(result, "div", attrs = { "class": "ui-block.+?" })
-            url = [i for i in url if str('tt' + imdb) in i][0]
-            url = common.parseDOM(url, "a", ret="href")[0]
-            url = '%s%s' % (self.base_link, url)
-            url = common.replaceHTMLCodes(url)
-            url = url.encode('utf-8')
+            post = urllib.urlencode({'token': token, 'query': show})
+            result = getUrl(base64.urlsafe_b64decode(self.search_link), post=post).result
+            result = json.loads(result)
+            url = result['result']['items']
+            url = [i for i in url if str('tt' + imdb) in i['poster']][0]
 
-            result = getUrl(url, cookie=cookie).result
-            url = result.split('"list-divider"')
-            url = [i for i in url if str('>Season %01d<' % int(season)) in i][-1]
-            url = re.compile('.*href="(item[.]php.+?)">.*E%01d<' % int(episode)).findall(url)[0]
-            url = '%s/%s' % (self.get_link, url)
-            url = common.replaceHTMLCodes(url)
-            url = url.encode('utf-8')
+            post = urllib.urlencode({'token': token, 'show': url['title'], 'cat_id': url['cat_id']})
+            result = getUrl(base64.urlsafe_b64decode(self.show_link), post=post).result
+            result = json.loads(result)
+            url = result['result']['items']
+            url = [i for i in url if i['season'] == str('%01d' % int(season)) and  i['episode'] == str('%01d' % int(episode))][0]
+            url = url['vid_id']
 
-            result = getUrl(url, cookie=cookie).result
-            if '/lib/get_embed.php' in result:
-                url = re.compile('/lib/get_embed.php.+?"(.+?)"').findall(result)[0]
-                url = self.embed_link % url
-                result = getUrl(url, cookie=cookie).result
-                url = common.parseDOM(result, "iframe", ret="src", attrs = { "id": "videoFrame" })[0]
-            else:
-                url = common.parseDOM(result, "iframe", ret="src")
-                url = [i for i in url if 'vk.com' in i][-1]
+            post = urllib.urlencode({'token': token, 'vid_id': url})
+            result = getUrl(base64.urlsafe_b64decode(self.get_link), post=post).result
+            result = json.loads(result)
+            url = result['video']['url']
             url = url.replace('http://', 'https://')
             url = common.replaceHTMLCodes(url)
             url = url.encode('utf-8')
@@ -3054,8 +3047,8 @@ class noobroom:
             search = 'http://www.imdbapi.com/?i=tt%s' % imdb
             search = getUrl(search).result
             search = json.loads(search)
-            country = search['Country']
-            if 'UK,' in country or ', UK' in country: return
+            country = [i.strip() for i in search['Country'].split(',')]
+            if 'UK' in country and not 'USA' in country: return
 
             query = self.search_link % (urllib.quote_plus(show))
 

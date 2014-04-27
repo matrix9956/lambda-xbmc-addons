@@ -1,4 +1,13 @@
 ------------------------
+GOmovies v2.0.4 (27-Apr-14)
+------------------------
+
+- Re-work of iStreamHD source.
+- NOTE: You will have to use your account, register at http://istreamhd.org.
+- Code cosmetics.
+
+
+------------------------
 GOmovies v2.0.2 (26-Apr-14)
 ------------------------
 
