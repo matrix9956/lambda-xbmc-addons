@@ -1,4 +1,13 @@
 ------------------------
+Yify Movies HD v1.4.2 (30-Apr-14)
+------------------------
+
+- Added support for captchas.
+- NOTE: Captchas are almost unreadable and you have to be 100% correct.
+- Code cosmetics.
+
+
+------------------------
 Yify Movies HD v1.4.1 (26-Apr-14)
 ------------------------
 

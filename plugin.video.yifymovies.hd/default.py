@@ -1473,24 +1473,101 @@ class resolver:
     def yify(self, url):
         try:
             referer = url
-            result = getUrl(url).result
+
+            result = getUrl(url, referer=referer, close=False).result
             url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
             url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p2.php?url=' + url
 
-            result = getUrl(url, referer=referer).result
-            links = re.compile('"url":"(.+?)"').findall(result)
+            result = getUrl(url, referer=referer, close=False).result
+            if '"challenge":' in result: return self.yify2(referer)
+            result = json.loads(result)
 
-            url = [i for i in links if '/gs.video.tt/' in i]
-            if not url == []: return url[-1]
-
-            url = [i for i in links if 'videoplayback?' in i]
-            try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-            except: url = url[-1]
-
+            url = [i['url'] for i in result if 'video/mpeg4' in i['type']][-1]
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
             else: url = url.replace('https://', 'http://')
             return url
+        except:
+            return
+
+    def yify2(self, url):
+        referer = url
+
+        for i in range(1, 11):
+            try:
+                result = getUrl(referer, referer=referer, close=False).result
+                url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
+                url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p2.php?url=' + url
+
+                result = getUrl(url, referer=referer, close=False).result
+                result = json.loads(result)
+
+                challenge, type, solution = self.captcha(result)
+                u = url + '&chall=%s&res=%s&type=%s' % (challenge, type, solution.replace(' ', '%20'))
+                result = getUrl(u, referer=referer).result
+                result = json.loads(result)
+
+                url = [i['url'] for i in result if 'video/mpeg4' in i['type']][-1]
+                url = getUrl(url, output='geturl').result
+                if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
+                else: url = url.replace('https://', 'http://')
+                return url
+            except:
+                yes = index().yesnoDialog('Wrong captcha or error with captchas.', 'Try again?')
+                if not yes: break
+
+    def captcha(self, result):
+        try:
+            import shutil
+            puzzles = xbmc.translatePath('special://temp/puzzles')
+            try: shutil.rmtree(puzzles)
+            except: pass
+            try: os.makedirs(puzzles)
+            except: pass
+
+            image = os.path.join(puzzles, "solve_puzzle.png")
+
+            challenge = result[0]['challenge']
+            type = result[0]['captcha']
+
+            puzzle = result[0]['imgsrc']
+            puzzle = puzzle.split('base64,')[-1]
+            puzzle = base64.b64decode(puzzle)
+
+            file = open(image, 'wb')
+            file.write(puzzle)
+            file.close()
+
+            solution = self.solution(image)
+
+            return (challenge, type, solution)
+        except:
+            return (None, None, None)
+
+    def solution(self, image):
+        try:
+            image = xbmcgui.ControlImage(450,15,400,130, image)
+            wdlg = xbmcgui.WindowDialog()
+            wdlg.addControl(image)
+            wdlg.show()
+
+            xbmc.sleep(3000)
+
+            kb = xbmc.Keyboard('', 'Type the letters in the image', False)
+            kb.doModal()
+            capcode = kb.getText()
+
+            if (kb.isConfirmed()):
+                userInput = kb.getText()
+                if userInput != '':
+                    solution = kb.getText()
+                elif userInput == '':
+                    raise Exception ('You must enter text in the image to access video')
+            else:
+                raise Exception ('Captcha Error')
+            wdlg.close()
+
+            return solution
         except:
             return
 
