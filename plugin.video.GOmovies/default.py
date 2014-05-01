@@ -1467,8 +1467,8 @@ class movies:
                 if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 name = '%s (%s)' % (title, year)
-                name = common.replaceHTMLCodes(name)
-                name = name.encode('utf-8')
+                try: name = name.encode('utf-8')
+                except: pass
 
                 url = common.parseDOM(movie, "a", ret="href")[0]
                 url = '%s%s' % (link().imdb_base, url)
@@ -1531,8 +1531,8 @@ class movies:
                 if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 name = '%s (%s)' % (title, year)
-                name = common.replaceHTMLCodes(name)
-                name = name.encode('utf-8')
+                try: name = name.encode('utf-8')
+                except: pass
 
                 url = common.parseDOM(movie, "a", ret="href")[0]
                 url = re.findall('tt(\d*)', url, re.I)[0]
@@ -1585,8 +1585,8 @@ class movies:
                 if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 name = '%s (%s)' % (title, year)
-                name = common.replaceHTMLCodes(name)
-                name = name.encode('utf-8')
+                try: name = name.encode('utf-8')
+                except: pass
 
                 url = movie['url']
                 url = '%s%s' % (link().imdb_base, url)
@@ -1642,8 +1642,8 @@ class movies:
                 if int(year) > int((datetime.datetime.utcnow() - datetime.timedelta(hours = 5)).strftime("%Y")): raise Exception()
 
                 name = '%s (%s)' % (title, year)
-                name = common.replaceHTMLCodes(name)
-                name = name.encode('utf-8')
+                try: name = name.encode('utf-8')
+                except: pass
 
                 imdb = movie['imdb_id']
                 imdb = re.sub('[^0-9]', '', str(imdb))

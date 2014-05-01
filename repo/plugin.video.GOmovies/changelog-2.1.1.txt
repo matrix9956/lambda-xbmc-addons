@@ -1,4 +1,12 @@
 ------------------------
+GOmovies v2.1.1 (1-May-14)
+------------------------
+
+- Fixed issues with movie listings.
+- Code cosmetics.
+
+
+------------------------
 GOmovies v2.1.0 (1-May-14)
 ------------------------
 
