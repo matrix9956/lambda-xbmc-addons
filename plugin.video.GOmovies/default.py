@@ -435,16 +435,16 @@ class index:
 
     def settings_reset(self):
         try:
-            if getSetting("settings_version") == '2.0.0': return
+            if getSetting("settings_version") == '2.1.0': return
             settings = os.path.join(addonPath,'resources/settings.xml')
             file = xbmcvfs.File(settings)
             read = file.read()
             file.close()
-            for i in range (1,4): setSetting('hosthd' + str(i), common.parseDOM(read, "setting", ret="default", attrs = {"id": 'hosthd' + str(i)})[0])
-            for i in range (1,11): setSetting('host' + str(i), common.parseDOM(read, "setting", ret="default", attrs = {"id": 'host' + str(i)})[0])
+            for i in range (1,12): setSetting('hosthd' + str(i), common.parseDOM(read, "setting", ret="default", attrs = {"id": 'hosthd' + str(i)})[0])
+            for i in range (1,16): setSetting('host' + str(i), common.parseDOM(read, "setting", ret="default", attrs = {"id": 'host' + str(i)})[0])
             setSetting('autoplay_library', common.parseDOM(read, "setting", ret="default", attrs = {"id": 'autoplay_library'})[0])
             setSetting('autoplay', common.parseDOM(read, "setting", ret="default", attrs = {"id": 'autoplay'})[0])
-            setSetting('settings_version', '2.0.0')
+            setSetting('settings_version', '2.1.0')
         except:
             return
 
@@ -1433,17 +1433,7 @@ class movies:
         if not (self.query is None or self.query == ''):
             self.query = link().imdb_search % urllib.quote_plus(self.query)
             self.list = self.imdb_list(self.query)
-            if getSetting("filter_search") == 'true': self.list = self.search_filter()
             index().movieList(self.list)
-
-    def search_filter(self):
-        filter = []
-        for i in self.list:
-            sources = resolver().sources_get(i['name'], i['title'], i['imdb'], i['year'], resolver().hostDict)
-            if not sources == []: filter.append(i['url'])
-        self.list = [i for i in self.list if any(x == i['url'] for x in filter)]
-
-        return self.list
 
     def imdb_list(self, url):
         try:
@@ -1829,15 +1819,25 @@ class resolver:
         if getSetting("muchmovies") == 'true':
             threads.append(Thread(muchmovies().get, name, title, imdb, year, hostDict))
 
+        global movieshd_sources
+        movieshd_sources = []
+        if getSetting("movieshd") == 'true':
+            threads.append(Thread(movieshd().get, name, title, imdb, year, hostDict))
+
+        global glowgaze_sources
+        glowgaze_sources = []
+        if getSetting("glowgaze") == 'true':
+            threads.append(Thread(glowgaze().get, name, title, imdb, year, hostDict))
+
+        global movietube_sources
+        movietube_sources = []
+        if getSetting("movietube") == 'true':
+            threads.append(Thread(movietube().get, name, title, imdb, year, hostDict))
+
         global yify_sources
         yify_sources = []
         if getSetting("yify") == 'true':
             threads.append(Thread(yify().get, name, title, imdb, year, hostDict))
-
-        global viooz_sources
-        viooz_sources = []
-        if getSetting("viooz") == 'true':
-            threads.append(Thread(viooz().get, name, title, imdb, year, hostDict))
 
         global moviestorm_sources
         moviestorm_sources = []
@@ -1857,7 +1857,7 @@ class resolver:
         [i.start() for i in threads]
         [i.join() for i in threads]
 
-        self.sources = icefilms_sources + movie25_sources + vkbox_sources + istreamhd_sources + simplymovies_sources + muchmovies_sources + yify_sources + viooz_sources + moviestorm_sources + noobroom_sources + merdb_sources
+        self.sources = icefilms_sources + movie25_sources + vkbox_sources + istreamhd_sources + simplymovies_sources + muchmovies_sources + movieshd_sources + glowgaze_sources + movietube_sources + yify_sources + moviestorm_sources + noobroom_sources + merdb_sources
 
         return self.sources
 
@@ -1869,8 +1869,10 @@ class resolver:
             elif provider == 'iStreamHD': url = istreamhd().resolve(url)
             elif provider == 'Simplymovies': url = simplymovies().resolve(url)
             elif provider == 'Muchmovies': url = muchmovies().resolve(url)
+            elif provider == 'MoviesHD': url = movieshd().resolve(url)
+            elif provider == 'Glowgaze': url = glowgaze().resolve(url)
+            elif provider == 'Movietube': url = movietube().resolve(url)
             elif provider == 'YIFY': url = yify().resolve(url)
-            elif provider == 'Viooz': url = viooz().resolve(url)
             elif provider == 'Moviestorm': url = moviestorm().resolve(url)
             elif provider == 'Noobroom': url = noobroom().resolve(url)
             elif provider == 'MerDB': url = merdb().resolve(url)
@@ -1879,9 +1881,9 @@ class resolver:
             return
 
     def sources_filter(self):
-        #hd_rank = ['VK', 'Muchmovies', 'YIFY', 'Viooz', 'Noobroom', 'Movreel', 'Billionuploads', '180upload', 'Hugefiles']
-        #sd_rank = ['VK', 'Viooz', 'iShared', 'Noobroom', 'Firedrive', 'Putlocker', 'Sockshare', 'Played', 'Promptfile', 'Mightyupload', 'Gorillavid', 'Divxstage', 'Movreel', 'Flashx', 'Sharesix']
-        hd_rank = [getSetting("hosthd1"), getSetting("hosthd2"), getSetting("hosthd3"), getSetting("hosthd4"), getSetting("hosthd5"), getSetting("hosthd6"), getSetting("hosthd7"), getSetting("hosthd8"), getSetting("hosthd9")]
+        #hd_rank = ['VK', 'Muchmovies', 'MoviesHD', 'Glowgaze', 'Movietube', 'YIFY', 'Noobroom', 'Movreel', 'Billionuploads', '180upload', 'Hugefiles']
+        #sd_rank = ['VK', 'Glowgaze', 'iShared', 'Noobroom', 'Firedrive', 'Putlocker', 'Sockshare', 'Played', 'Promptfile', 'Mightyupload', 'Gorillavid', 'Divxstage', 'Movreel', 'Flashx', 'Sharesix']
+        hd_rank = [getSetting("hosthd1"), getSetting("hosthd2"), getSetting("hosthd3"), getSetting("hosthd4"), getSetting("hosthd5"), getSetting("hosthd6"), getSetting("hosthd7"), getSetting("hosthd8"), getSetting("hosthd9"), getSetting("hosthd10"), getSetting("hosthd11")]
         sd_rank = [getSetting("host1"), getSetting("host2"), getSetting("host3"), getSetting("host4"), getSetting("host5"), getSetting("host6"), getSetting("host7"), getSetting("host8"), getSetting("host9"), getSetting("host10"), getSetting("host11"), getSetting("host12"), getSetting("host13"), getSetting("host14"), getSetting("host15")]
 
         for i in range(len(self.sources)): self.sources[i]['source'] = self.sources[i]['source'].lower()
@@ -2255,7 +2257,7 @@ class istreamhd:
             result = getUrl(base64.urlsafe_b64decode(self.search_link), post=post).result
             result = json.loads(result)
             url = result['result']['items']
-            url = [i for i in url if str('tt' + imdb) in i['poster']][0]
+            url = [i for i in url if str('tt' + imdb) in i['imdb_id']][0]
             url = url['id']
 
             post = urllib.urlencode({'token': token, 'vid_id': url})
@@ -2395,11 +2397,189 @@ class muchmovies:
         except:
             return
 
+class movieshd:
+    def __init__(self):
+        self.base_link = 'http://movieshd.co'
+        self.search_link = 'http://movieshd.co/?s=%s'
+        self.player_link = 'http://videomega.tv/iframe.php?ref=%s'
+
+    def get(self, name, title, imdb, year, hostDict):
+        try:
+            global movieshd_sources
+            movieshd_sources = []
+
+            query = self.search_link % (urllib.quote_plus(title))
+
+            result = getUrl(query).result
+            url = common.parseDOM(result, "ul", attrs = { "class": "listing-videos.+?" })[0]
+            url = common.parseDOM(url, "li", attrs = { "class": ".+?" })
+            url = [i for i in url if any(x in self.cleantitle(re.sub('[(]\d{4}[)]', '<', i)) for x in [str('>' + self.cleantitle(title) + '<')]) and any(x in i for x in [' (%s)' % str(year), ' (%s)' % str(int(year)+1), ' (%s)' % str(int(year)-1)])][0]
+            url = common.parseDOM(url, "a", ret="href")[0]
+            url = common.replaceHTMLCodes(url)
+            url = url.encode('utf-8')
+
+            result = getUrl(url).result
+            url = common.parseDOM(result, "div", attrs = { "class": "video-embed" })[0]
+            url = re.compile("ref='(.+?)'").findall(url)[0]
+            url = self.player_link % url
+            url = url.encode('utf-8')
+
+            result = getUrl(url).result
+            url = re.compile('document.write.unescape."(.+?)"').findall(result)[0]
+            url = urllib.unquote_plus(url)
+            url = re.compile('file: "(.+?)"').findall(url)[0]
+            url = common.replaceHTMLCodes(url)
+            url = url.encode('utf-8')
+
+            movieshd_sources.append({'source': 'MoviesHD', 'quality': 'HD', 'provider': 'MoviesHD', 'url': url})
+        except:
+            return
+
+    def cleantitle(self, title):
+        title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
+        return title
+
+    def resolve(self, url):
+        return url
+
+class glowgaze:
+    def __init__(self):
+        self.base_link = 'http://g2g.fm'
+        self.forum_link = 'http://g2g.fm/forum'
+        self.search_link = 'http://g2g.fm/forum/search.php?do=process&titleonly=1&query=online+%s'
+
+    def get(self, name, title, imdb, year, hostDict):
+        try:
+            global glowgaze_sources
+            glowgaze_sources = []
+
+            query = self.search_link % (urllib.quote_plus(title))
+
+            result = getUrl(query).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            url = common.parseDOM(result, "div", attrs = { "class": "threadinfo thread" })
+            url = [i for i in url if any(x in self.cleantitle(re.sub('[(]\d{4}[)]', '<', i)) for x in [str('>' + self.cleantitle(title) + '<')]) and any(x in i for x in [' (%s)' % str(year), ' (%s)' % str(int(year)+1), ' (%s)' % str(int(year)-1)])][0]
+            name = common.parseDOM(url, "a", attrs = { "class": "title" })[0]
+            url = common.parseDOM(url, "a", ret="href", attrs = { "class": "title" })[0]
+            url = re.findall('(.+?[?]\d+)-', url, re.I)[0]
+            url = '%s/%s' % (self.forum_link, url)
+            url = common.replaceHTMLCodes(url)
+            url = url.encode('utf-8')
+
+            if ' Season ' in name and ' Episode ' in name: raise Exception()
+            if ' 1080p ' in name or ' 720p ' in name: quality = 'HD'
+            else: quality = 'SD'
+
+            result = getUrl(url).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            result = common.parseDOM(result, "div", attrs = { "class": "content" })[0]
+            result = common.parseDOM(result, "iframe", ret="src")[0]
+            result = getUrl(result, referer=self.base_link).result
+
+            try:
+                url = re.compile('{file:"(.+?)"').findall(result)
+                if url == []: raise Exception()
+                url = [common.replaceHTMLCodes(i) for i in url]
+                url = [i for i in url if 'videoplayback?' in i]
+                try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
+                except: url = url[-1]
+                url = getUrl(url, output='geturl').result
+            except:
+                url = common.parseDOM(result, "iframe", ret="src")[0]
+                url = getUrl(url).result
+                url = re.findall('("fmt_stream_map":".+?")', url, re.I)[0]
+                url = json.loads('{' + url + '}')['fmt_stream_map']
+                url = [i.split('|')[-1] for i in url.split(',')]
+                try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][0]
+                except: url = url[0]
+
+            glowgaze_sources.append({'source': 'Glowgaze', 'quality': quality, 'provider': 'Glowgaze', 'url': url})
+        except:
+            return
+
+    def cleantitle(self, title):
+        title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
+        return title
+
+    def resolve(self, url):
+        try:
+            url = getUrl(url, output='geturl').result
+            if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
+            else: url = url.replace('https://', 'http://')
+            return url
+        except:
+            return
+
+class movietube:
+    def __init__(self):
+        self.base_link = 'http://www.movietube.cc'
+        self.index_link = 'http://www.movietube.cc/index.php'
+
+    def get(self, name, title, imdb, year, hostDict):
+        try:
+            global movietube_sources
+            movietube_sources = []
+
+            post = urllib.urlencode({'a': 'retrieve', 'c': 'result', 'p': '{"KeyWord":"%s","Page":"1","NextToken":""}' % title})
+            result = getUrl(self.index_link, post=post).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            url = common.parseDOM(result, "tr")
+            url = [i for i in url if any(x in self.cleantitle(re.sub('[(]\d{4}[)]', '<', i)) for x in [str('>' + self.cleantitle(title) + '<')]) and any(x in i for x in [' (%s)' % str(year), ' (%s)' % str(int(year)+1), ' (%s)' % str(int(year)-1)])][0]
+            url = common.parseDOM(url, "a", ret="href")[0]
+            url = url.split('?v=')[-1]
+
+            post = urllib.urlencode({'a': 'getmoviealternative', 'c': 'result', 'p': '{"KeyWord":"%s"}' % url})
+            result = getUrl(self.index_link, post=post).result
+            result = re.compile('(<a.+?</a>)').findall(result)
+            result = [i for i in result if '0000000008400000' in i or '0000000008100000' in i]
+            links = [i for i in result if '>1080p<' in i]
+            links += [i for i in result if '>720p<' in i]
+            links = links[:3]
+
+            for i in links:
+                try:
+                    url = common.parseDOM(i, "a", ret="href")[0]
+                    url = url.split('?v=')[-1]
+                    post = urllib.urlencode({'a': 'getplayerinfo', 'c': 'result', 'p': '{"KeyWord":"%s"}' % url})
+                    url = getUrl(self.index_link, post=post).result
+
+                    if '0000000008400000' in i:
+                        url = common.parseDOM(url, "source", ret="src", attrs = { "type": "video/mp4" })[0]
+                        url = getUrl(url, output='geturl').result
+                    elif '0000000008100000' in i:
+                        url = common.parseDOM(url, "iframe", ret="src")[0]
+                        url = getUrl(url).result
+                        url = re.findall('("fmt_stream_map":".+?")', url, re.I)[0]
+                        url = json.loads('{' + url + '}')['fmt_stream_map']
+                        url = [i.split('|')[-1] for i in url.split(',')]
+                        url = url[0]
+
+                    movietube_sources.append({'source': 'Movietube', 'quality': 'HD', 'provider': 'Movietube', 'url': url})
+                    return
+                except:
+                    pass
+        except:
+            return
+
+    def cleantitle(self, title):
+        title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
+        return title
+
+    def resolve(self, url):
+        try:
+            url = getUrl(url, output='geturl').result
+            if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
+            else: url = url.replace('https://', 'http://')
+            return url
+        except:
+            return
+
 class yify:
     def __init__(self):
         self.base_link = 'http://yify.tv'
         self.ajax_link = 'http://yify.tv/wp-admin/admin-ajax.php'
         self.post_link = 'action=ajaxy_sf&sf_value=%s'
+        self.player_link = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p2.php?url=%s'
 
     def get(self, name, title, imdb, year, hostDict):
         try:
@@ -2419,6 +2599,16 @@ class yify:
             result = getUrl(url).result
             if not str('tt' + imdb) in result: raise Exception()
 
+            url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
+            url = self.player_link % url
+
+            result = getUrl(url, referer=url).result
+            result = json.loads(result)
+
+            url = [i['url'] for i in result if 'x-shockwave-flash' in i['type']]
+            url += [i['url'] for i in result if 'video/mpeg4' in i['type']]
+            url = url[-1]
+
             yify_sources.append({'source': 'YIFY', 'quality': 'HD', 'provider': 'YIFY', 'url': url})
         except:
             return
@@ -2429,92 +2619,6 @@ class yify:
 
     def resolve(self, url):
         try:
-            referer = url
-            result = getUrl(url).result
-            url = re.compile('showPkPlayer[(]"(.+?)"[)]').findall(result)[0]
-            url = 'http://yify.tv/reproductor2/pk/pk/plugins/player_p2.php?url=' + url
-
-            result = getUrl(url, referer=referer).result
-            links = re.compile('"url":"(.+?)"').findall(result)
-
-            url = [i for i in links if '/gs.video.tt/' in i]
-            if not url == []: return url[-1]
-
-            url = [i for i in links if 'videoplayback?' in i]
-            try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-            except: url = url[-1]
-
-            url = getUrl(url, output='geturl').result
-            if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
-            else: url = url.replace('https://', 'http://')
-            return url
-        except:
-            return
-
-class viooz:
-    def __init__(self):
-        self.base_link = 'http://viooz.co'
-        self.search_link = 'http://viooz.co/search?s=t&q=%s'
-        self.proxy_link = 'http://9proxy.in/b.php?u=%s&b=12'
-
-    def get(self, name, title, imdb, year, hostDict):
-        try:
-            global viooz_sources
-            viooz_sources = []
-
-            query = self.search_link % (urllib.quote_plus(title))
-            query = self.proxy_link % urllib.quote_plus(urllib.unquote_plus(query))
-
-            result = getUrl(query, referer=query).result
-            url = common.parseDOM(result, "div", attrs = { "class": "list_film_header" })
-            url = [i for i in url if any(x in self.cleantitle(i) for x in [str('>' + self.cleantitle(title) + '<')]) and any(x in i for x in [' (%s)' % str(year), ' (%s)' % str(int(year)+1), ' (%s)' % str(int(year)-1)])][0]
-            url = common.parseDOM(url, "a", ret="href")[0]
-            url = urllib.unquote_plus(url.split('/b.php?u=', 1)[-1].split('&amp;', 1)[0])
-            url = common.replaceHTMLCodes(url)
-            url = url.encode('utf-8')
-
-            u = self.proxy_link % urllib.quote_plus(urllib.unquote_plus(url))
-            result = getUrl(u, referer=u).result
-            if not str('tt' + imdb) in result: raise Exception()
-
-            if 'class="movieHD"' in result: quality = 'HD'
-            elif 'class="lq_img"' in result: quality = 'CAM'
-            else: quality = 'SD'
-
-            viooz_sources.append({'source': 'Viooz', 'quality': quality, 'provider': 'Viooz', 'url': url})
-        except:
-            return
-
-    def cleantitle(self, title):
-        title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
-        return title
-
-    def resolve(self, url):
-        try:
-            url = self.proxy_link % urllib.quote_plus(urllib.unquote_plus(url))
-            result = getUrl(url, referer=url).result
-
-            try:
-                url = common.parseDOM(result, "source", ret="src", attrs = { "type": "video/.+?" })[0]
-                url = urllib.unquote_plus(url.split('/b.php?u=', 1)[-1].split('&amp;', 1)[0])
-                url = common.replaceHTMLCodes(url)
-            except:
-                import decrypter
-                url = re.compile('proxy[.]link=viooz[*](.+?)&').findall(result)[0]
-                url = common.replaceHTMLCodes(url)
-                url = decrypter.decrypter(198,128).decrypt(url,base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='),'ECB').split('\0')[0]
-
-                result = getUrl(url).result
-                url = common.parseDOM(result, "link", ret="href", attrs = { "rel": "alternate" })[0]
-                url = common.replaceHTMLCodes(url)
-
-                result = getUrl(url).result
-                url = common.parseDOM(result, "media:content", ret="url")
-                url = [common.replaceHTMLCodes(i) for i in url]
-                url = [i for i in url if 'videoplayback?' in i]
-                try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-                except: url = url[-1]
-
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
             else: url = url.replace('https://', 'http://')

@@ -1,4 +1,19 @@
 ------------------------
+GOmovies v2.1.0 (1-May-14)
+------------------------
+
+- Added MoviesHD source.
+- Added Glowgaze source.
+- Added Movietube source.
+- Tweaked iStreamHD source.
+- Fixed issues with Yify source.
+- Removed Viooz source.
+- Removed filtering of search.
+- NOTE: Hosts are set to new defaults.
+- Code cosmetics.
+
+
+------------------------
 GOmovies v2.0.4 (27-Apr-14)
 ------------------------
 
