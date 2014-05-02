@@ -1,4 +1,13 @@
 ------------------------
+GOmovies v2.1.2 (2-May-14)
+------------------------
+
+- Removed metadata in movie search.
+- NOTE: Movie search will now be faster.
+- Code cosmetics.
+
+
+------------------------
 GOmovies v2.1.1 (1-May-14)
 ------------------------
 

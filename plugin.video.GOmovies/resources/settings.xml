@@ -27,8 +27,8 @@
 		<setting id="hosthd7" type="labelenum" label="30037" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="Noobroom"/>
 		<setting id="hosthd8" type="labelenum" label="30038" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="Movreel"/>
 		<setting id="hosthd9" type="labelenum" label="30039" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="Billionuploads"/>
-		<setting id="hosthd10" type="labelenum" label="30039" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="180upload"/>
-		<setting id="hosthd11" type="labelenum" label="30039" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="Hugefiles"/>
+		<setting id="hosthd10" type="labelenum" label="30040" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="180upload"/>
+		<setting id="hosthd11" type="labelenum" label="30041" values="-|VK|Muchmovies|MoviesHD|Glowgaze|Movietube|YIFY|Noobroom|Movreel|Billionuploads|180upload|Hugefiles" default="Hugefiles"/>
 	</category>
 
 	<category label="30052">
