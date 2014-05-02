@@ -1,4 +1,12 @@
 ------------------------
+Hellenic TV v2.6.3 (2-May-14)
+------------------------
+
+- Updated STAR, ET3, ACTION 24, START TV and ACHAIA CHANNEL.
+- Code cosmetics.
+
+
+------------------------
 Hellenic TV v2.6.2 (1-Apr-14)
 ------------------------
 

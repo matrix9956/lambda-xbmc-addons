@@ -388,10 +388,10 @@ class resolver:
                 'visionip'          : self.visionip,
                 'skai'              : self.skai,
                 'madtv'             : self.madtv,
+                'action24'          : self.action24,
                 'viiideo'           : self.viiideo,
                 'dailymotion'       : self.dailymotion,
                 'livestream'        : self.livestream,
-                'livestream_new'    : self.livestream_new,
                 'ustream'           : self.ustream,
                 'veetle'            : self.veetle,
                 'justin'            : self.justin
@@ -514,16 +514,14 @@ class resolver:
         except:
             return
 
-    def livestream_new(self, url):
+    def action24(self, url):
         try:
             result = getUrl(url).result
-            url = re.compile('"play_url":"(.+?)"').findall(result)[0]
+            url = common.parseDOM(result, "iframe", ret="src")
+            url = [i for i in url if 'dmcloud.net' in i][0]
 
             result = getUrl(url).result
-            http = common.parseDOM(result, "meta", ret="content", attrs = { "name": "httpBase" })[0]
-            video = common.parseDOM(result, "video", ret="src")[0]
-            url = '%s/%s' % (http, video)
-
+            url = re.compile('"ios_url": "(.+?)"').findall(result)[0]
             return url
         except:
             return

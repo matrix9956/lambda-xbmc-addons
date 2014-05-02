@@ -6,8 +6,8 @@
 			<type>hls</type>
 			<url>http://megahdlive1-f.akamaihd.net/i/live_1@105260/master.m3u8</url>
 			<type2></type2>
-			<url2>rtmp://37.48.66.244:80/megaweb playpath=megaweb.sdp pageUrl=http://www.kanalia.eu/ live=1 timeout=10</url2>
-			<base>http://kanalia.eu/mega_channel_original.php</base>
+			<url2>rtmpe://80.82.70.225:443/liveedge1 playpath=mega765 pageUrl=http://xuscacamusca.se live=1 timeout=10</url2>
+			<base>http://www.megatv.com/webtv</base>
 			<epg>30501</epg>
 		</channel>
 		<channel active="True">
@@ -15,15 +15,15 @@
 			<type>hls</type>
 			<url>http://wow.ant1.gr:1935/live/smil:mavani.smil/playlist.m3u8</url>
 			<type2></type2>
-			<url2>rtmp://tmplive.ant1.gr:80/live playpath=mavani swfUrl=http://static.ant1.gr/live.ashx pageUrl=http://webtv.antenna.gr/webtv/live conn=B:0 swfVfy=1 live=1 timeout=10</url2>
+			<url2>rtmpe://80.82.70.225:443/liveedge1 playpath=ant1386 pageUrl=http://xuscacamusca.se live=1 timeout=10</url2>
 			<base>http://www.antenna.gr/webtv/doubleip/live</base>
 			<epg>30502</epg>
 		</channel>
 		<channel active="True">
 			<name>STAR</name>
 			<type></type>
-			<url>rtmp://37.48.66.244:80/alterweb playpath=alterweb.sdp pageUrl=http://www.kanalia.eu/ live=1 timeout=10</url>
-			<base>http://kanalia.eu/star_original.php</base>
+			<url>rtmpe://80.82.70.225:443/liveedge1 playpath=star174 pageUrl=http://xuscacamusca.se live=1 timeout=10</url>
+			<base></base>
 			<epg>30503</epg>
 		</channel>
 		<channel active="True">
@@ -65,10 +65,8 @@
 		</channel>
 		<channel active="True">
 			<name>ET3</name>
-			<type>veetle</type>
-			<url>http://veetle.com/index.php/channel/view#51b7cee75aed5</url>
-			<type2></type2>
-			<url2>rtmp://live2.ertopen.com:443/live2 live=1 timeout=10</url2>
+			<type>hls</type>
+			<url>http://live2.ertopen.com/live2/e600/playlist.m3u8</url>
 			<base>http://www.ertopen.com/</base>
 			<epg>30509</epg>
 		</channel>
@@ -213,8 +211,8 @@
 		</channel>
 		<channel active="True">
 			<name>ACTION 24</name>
-			<type>livestream_new</type>
-			<url>http://new.livestream.com/action24/action24</url>
+			<type>action24</type>
+			<url>http://www.action24.gr/</url>
 			<base>http://www.action24.gr/</base>
 			<epg>30563</epg>
 		</channel>
@@ -472,7 +470,7 @@
 		<channel active="True">
 			<name>START TV</name>
 			<type>veetle</type>
-			<url>http://veetle.com/index.php/channel/view#5149a191525c6</url>
+			<url>http://veetle.com/index.php/channel/view#535a3b85c0310</url>
 			<base>http://www.startmedia.gr/</base>
 			<epg>30645</epg>
 		</channel>
@@ -510,7 +508,7 @@
 		<channel active="True">
 			<name>ACHAIA CHANNEL</name>
 			<type></type>
-			<url>rtmp://78.129.184.15:20141/streaming/stream pageUrl=http://achaianews.listen2myradio.com/ live=1 timeout=10</url>
+			<url>rtmp://78.129.184.15:11056/streaming/stream pageUrl=http://achaianews.listen2myradio.com/ live=1 timeout=10</url>
 			<base>http://www.achaianews.gr/</base>
 			<epg>30662</epg>
 		</channel>
