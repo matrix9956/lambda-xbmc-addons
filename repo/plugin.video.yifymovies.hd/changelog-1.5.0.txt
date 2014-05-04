@@ -1,4 +1,17 @@
 ------------------------
+Yify Movies HD v1.5.0 (4-May-14)
+------------------------
+
+- Re-work of addon.
+- Added full remote share support.
+- Added backup streams for non working movies.
+- Fixed playback issues.
+- Tweaked all listings.
+- Removed captchas.
+- Code cosmetics.
+
+
+------------------------
 Yify Movies HD v1.4.2 (30-Apr-14)
 ------------------------
 

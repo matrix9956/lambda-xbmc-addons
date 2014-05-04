@@ -1,4 +1,13 @@
 ------------------------
+GOtv v2.1.0 (4-May-14)
+------------------------
+
+- Removed metadata in tv show search.
+- NOTE: TV show search will now be faster.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.0.4 (27-Apr-14)
 ------------------------
 

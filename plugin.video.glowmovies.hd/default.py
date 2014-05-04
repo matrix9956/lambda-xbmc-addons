@@ -108,12 +108,12 @@ class main:
         elif action == 'download':                  contextMenu().download(name, url)
         elif action == 'trailer':                   contextMenu().trailer(name, url)
         elif action == 'movies':                    movies().get(url)
-        elif action == 'movies_all':                movies().glow_all()
-        elif action == 'movies_added':              movies().glow_added()
-        elif action == 'movies_search':             movies().glow_search(query)
+        elif action == 'movies_all':                movies().all()
+        elif action == 'movies_added':              movies().added()
+        elif action == 'movies_search':             movies().search(query)
         elif action == 'movies_favourites':         favourites().movies()
-        elif action == 'genres_movies':             genres().glow()
-        elif action == 'years_movies':              years().glow()
+        elif action == 'genres_movies':             genres().get()
+        elif action == 'years_movies':              years().get()
         elif action == 'play':                      resolver().run(url, name)
 
         if action is None:
@@ -208,7 +208,7 @@ class player(xbmc.Player):
             item.setInfo( type="Video", infoLabels= meta )
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-        for i in range(1, 21):
+        for i in range(0, 250):
             try: self.totalTime = self.getTotalTime()
             except: self.totalTime = 0
             if not self.totalTime == 0: continue
@@ -229,10 +229,25 @@ class player(xbmc.Player):
         self.imdb = re.sub('[^0-9]', '', imdb)
         self.subtitle = subtitles().get(self.name, self.imdb, '', '')
 
+    def container_refresh(self):
+        try:
+            params = {}
+            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
+            for i in query: params[i.split('=')[0]] = i.split('=')[1]
+            if not params["action"].endswith('_search'): index().container_refresh()
+        except:
+            pass
+
     def offset_add(self):
         try:
-            file = open(offData, 'a+')
-            file.write('"%s"|"%s"|"%s"\n' % (self.name, self.imdb, self.currentTime))
+            file = xbmcvfs.File(offData)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"' % (self.name, self.imdb, self.currentTime))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -242,10 +257,11 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(offData, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (self.name, self.imdb) in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -256,8 +272,8 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(line)[0]
+            read = [i for i in read.splitlines(True) if '"%s"|"%s"|"' % (self.name, self.imdb) in i][0]
+            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(read)[0]
         except:
             return
 
@@ -266,15 +282,6 @@ class player(xbmc.Player):
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetMovieDetails", "params": {"movieid" : %s, "playcount" : 1 }, "id": 1 }' % str(self.meta['movieid']))
         except:
             metaget.change_watched(self.content, '', self.imdb, season='', episode='', year='', watched=7)
-
-    def container_refresh(self):
-        try:
-            params = {}
-            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
-            for i in query: params[i.split('=')[0]] = i.split('=')[1]
-            if not params["action"].endswith('_search'): index().container_refresh()
-        except:
-            pass
 
     def resume_playback(self):
         offset = float(self.offset)
@@ -490,6 +497,7 @@ class index:
 
         file = xbmcvfs.File(favData)
         favRead = file.read()
+        favRead = favRead.replace(link().glow_old, link().glow_base)
         file.close()
 
         total = len(movieList)
@@ -611,10 +619,12 @@ class contextMenu:
             file = xbmcvfs.File(viewData)
             read = file.read()
             file.close()
-            file = open(viewData, 'w')
-            for line in re.compile('(".+?\n)').findall(read):
-                if not line.startswith('"%s"|"%s"|"' % (skin, content)): file.write(line)
-            file.write('"%s"|"%s"|"%s"\n' % (skin, content, str(view)))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (skin, content) in i]
+            write.append('"%s"|"%s"|"%s"' % (skin, content, str(view)))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(viewData, 'w')
+            file.write(str(write))
             file.close()
             viewName = xbmc.getInfoLabel('Container.Viewmode')
             index().infoDialog('%s%s%s' % (language(30301).encode("utf-8"), viewName, language(30302).encode("utf-8")))
@@ -624,8 +634,14 @@ class contextMenu:
     def favourite_add(self, data, name, url, image, imdb):
         try:
             index().container_refresh()
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            file = xbmcvfs.File(data)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -636,11 +652,14 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            if url in read:
+            if '"%s"' % url in read:
                 index().infoDialog(language(30307).encode("utf-8"), name)
                 return
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"\n' % (name, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -652,10 +671,11 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(data, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"' % url in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30304).encode("utf-8"), name)
         except:
@@ -667,13 +687,13 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
             if i == 0 : return
-            list[i], list[i-1] = list[i-1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write[i], write[i-1] = write[i-1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30305).encode("utf-8"), name)
         except:
@@ -685,13 +705,13 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
-            if i+1 == len(list): return
-            list[i], list[i+1] = list[i+1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
+            if i+1 == len(write): return
+            write[i], write[i+1] = write[i+1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30306).encode("utf-8"), name)
         except:
@@ -733,8 +753,9 @@ class contextMenu:
                             file.close()
                             line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
                             line2 = line.replace('"0"', '"%s"' % new_imdb).replace('"%s"' % imdb, '"%s"' % new_imdb)
-                            file = open(source, 'w')
-                            file.write(read.replace(line, line2))
+                            write = read.replace(line, line2)
+                            file = xbmcvfs.File(source, 'w')
+                            file.write(str(write))
                             file.close()
                         except:
                             pass
@@ -912,23 +933,24 @@ class root:
 
 class link:
     def __init__(self):
-        self.glow_base = 'http://glowgaze.com'
-        self.glow_forum = 'http://glowgaze.com/forum'
-        self.glow_all = 'http://glowgaze.com/movies'
-        self.glow_added = 'http://glowgaze.com/forum/search.php?do=process&titleonly=1&query=online'
-        self.glow_genres = 'http://glowgaze.com/movies/genre.php?showC=27'
-        self.glow_genre = 'http://glowgaze.com/forum/search.php?do=process&titleonly=1&query=online&tag=%s'
-        self.glow_years = 'http://glowgaze.com/movies/year.php?showC=20'
-        self.glow_year = 'http://glowgaze.com/forum/search.php?do=process&titleonly=1&query=online+%s'
-        self.glow_search = 'http://glowgaze.com/forum/search.php?do=process&titleonly=1&query=online+%s'
+        self.glow_base = 'http://g2g.fm'
+        self.glow_old = 'http://glowgaze.com'
+        self.glow_forum = 'http://g2g.fm/forum'
+        self.glow_all = 'http://g2g.fm/movies'
+        self.glow_added = 'http://g2g.fm/forum/search.php?do=process&titleonly=1&query=online'
+        self.glow_genres = 'http://g2g.fm/movies/genre.php?showC=27'
+        self.glow_genre = 'http://g2g.fm/forum/search.php?do=process&titleonly=1&query=online&tag=%s'
+        self.glow_years = 'http://g2g.fm/movies/year.php?showC=20'
+        self.glow_year = 'http://g2g.fm/forum/search.php?do=process&titleonly=1&query=online+%s'
+        self.glow_search = 'http://g2g.fm/forum/search.php?do=process&titleonly=1&query=online+%s'
 
 class genres:
     def __init__(self):
         self.list = []
 
-    def glow(self):
+    def get(self):
         #self.list = self.glow_list()
-        self.list = cache(self.glow_list)
+        self.list = cache3(self.glow_list)
         self.list = sorted(self.list, key=itemgetter('name'))
         index().pageList(self.list)
 
@@ -942,15 +964,14 @@ class genres:
 
         for genre in genres:
             try:
-
                 image = common.parseDOM(genre, "img", ret="src")[0]
                 image = common.replaceHTMLCodes(image)
                 image = image.encode('utf-8')
 
-                name = image.rsplit('/', 1)[-1].split('-GlowGaze')[0]
+                name = image.rsplit('/', 1)[-1].rsplit('-', 1)[0]
                 name = name.encode('utf-8')
 
-                url = link().glow_genre % name
+                url = link().glow_genre % name.lower()
                 url = url.encode('utf-8')
 
                 self.list.append({'name': name, 'url': url, 'image': image})
@@ -963,9 +984,9 @@ class years:
     def __init__(self):
         self.list = []
 
-    def glow(self):
+    def get(self):
         #self.list = self.glow_list()
-        self.list = cache(self.glow_list)
+        self.list = cache3(self.glow_list)
         index().pageList(self.list)
 
     def glow_list(self):
@@ -978,16 +999,15 @@ class years:
 
         for year in years:
             try:
-
                 image = common.parseDOM(year, "img", ret="src")[0]
                 image = common.replaceHTMLCodes(image)
                 image = image.encode('utf-8')
 
-                name = image.rsplit('/', 1)[-1].split('-GlowGaze')[0]
+                name = image.rsplit('/', 1)[-1].rsplit('-', 1)[0]
                 if not name.isdigit(): raise Exception()
                 name = name.encode('utf-8')
 
-                url = link().glow_year % name
+                url = link().glow_year % name.lower()
                 url = url.encode('utf-8')
 
                 self.list.append({'name': name, 'url': url, 'image': image})
@@ -1012,26 +1032,25 @@ class movies:
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def glow_all(self):
+    def all(self):
         #self.list = self.glow_list2(link().glow_all)
         self.list = cache(self.glow_list2, link().glow_all)
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def glow_added(self):
+    def added(self):
         #self.list = self.glow_list(link().glow_added)
         self.list = cache(self.glow_list, link().glow_added)
         index().movieList(self.list)
         index().nextList(self.list)
 
-    def glow_search(self, query=None):
+    def search(self, query=None):
         if query is None:
             self.query = common.getUserInput(language(30362).encode("utf-8"), '')
         else:
             self.query = query
         if not (self.query is None or self.query == ''):
             self.query = link().glow_search % urllib.quote_plus(self.query)
-            print self.query
             self.list = self.glow_list(self.query)
             index().movieList(self.list)
 
@@ -1071,10 +1090,12 @@ class movies:
                 name = name.encode('utf-8')
 
                 title = re.findall('(.+?)[(]\d{4}[)]', name, re.I)[0].strip()
-                title = title.encode('utf-8')
+                try: title = title.encode('utf-8')
+                except: pass
 
                 year = re.findall('.+?[(](\d{4})[)]', name, re.I)[0]
-                year = year.encode('utf-8')
+                try: year = year.encode('utf-8')
+                except: pass
 
                 url = common.parseDOM(movie, "a", ret="href", attrs = { "class": "title" })[0]
                 url = re.findall('(.+?[?]\d+)-', url, re.I)[0]
@@ -1082,13 +1103,7 @@ class movies:
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
-                try:
-                    image = common.parseDOM(movie, "a", ret="title", attrs = { "class": "title" })[0]
-                    image = re.findall('(http://.+?)&', image, re.I)[0]
-                    image = common.replaceHTMLCodes(image)
-                    image = image.encode('utf-8')
-                except:
-                    image = addonPoster
+                image = addonPoster
 
                 try:
                     imdb = common.parseDOM(movie, "a", ret="title", attrs = { "class": "title" })[0]
@@ -1138,10 +1153,12 @@ class movies:
                 name = name.encode('utf-8')
 
                 title = re.findall('(.+?)[(]\d{4}[)]', name, re.I)[0].strip()
-                title = title.encode('utf-8')
+                try: title = title.encode('utf-8')
+                except: pass
 
                 year = re.findall('.+?[(](\d{4})[)]', name, re.I)[0]
-                year = year.encode('utf-8')
+                try: year = year.encode('utf-8')
+                except: pass
 
                 url = common.parseDOM(movie, "a", ret="href")[0]
                 url = '%s/%s' % (link().glow_all, url)
@@ -1252,6 +1269,8 @@ class resolver:
             return
 
     def glow(self, url):
+        url = url.replace(link().glow_old, link().glow_base)
+
         try:
             r = getUrl(url).result
             r = r.decode('iso-8859-1').encode('utf-8')
@@ -1263,8 +1282,7 @@ class resolver:
             google = common.parseDOM(r, "iframe", ret="src")[0]
             google = common.replaceHTMLCodes(google)
 
-            referer = 'http://g2g.fm/'
-            result = getUrl(google, referer=referer).result
+            result = getUrl(google, referer=link().glow_base).result
 
             try:
                 url = re.compile('{file:"(.+?)"').findall(result)
@@ -1290,44 +1308,37 @@ class resolver:
             pass
 
         try:
-            yandex = re.findall('.*href="(http://yadi.sk/.+?)".+?<img', r, re.I)[0]
-            yandex = common.replaceHTMLCodes(yandex)
+            yandex = common.parseDOM(r, "a", ret="href", attrs = { "id": "dm\d+" })
+            yandex = [i for i in yandex if '/yadi.sk/' in i][0]
 
-            result = getUrl(yandex).result
-            url = re.findall('"iframe":"(.+?)"', result, re.I)[0]
-            if url.startswith('//'): url = 'http:' + url
-
-            result = getUrl(url).result
-            result = re.findall('<body(.+?)</body>', result, re.I)[0]
-            result = common.replaceHTMLCodes(result)
-
-            token = re.findall('"token":"(.+?)"', result, re.I)[0]
-            token = urllib.unquote(token).replace('\\/', '/')
-            if token.startswith('//'): token = 'http:' + token
-            token = getUrl(token).result
-            token = re.findall('<token>(.+?)</token>', token, re.I)[0]
-
-            file = re.findall('"mp4":{(.+?)}}}', result, re.I)[0]
-            file = re.findall('"file":"(.+?)"', file, re.I)[-1]
-            file = urllib.unquote(file).replace('\\/', '/')
-
-            url = re.findall('"video":"(.+?)"', result, re.I)[0]
-            url = urllib.unquote(url).replace('\\/', '/')
-            if url.startswith('//'): url = 'http:' + url
-            url = '%s%s.mp4?token=%s' % (url, file, token)
+            result = getUrl(yandex, close=False).result
+            ckey = re.compile('"ckey":"(.+?)"').findall(result)[0]
+            hash = re.compile('"hash":"(.+?)"').findall(result)[0]
+            post = urllib.urlencode({'_ckey': ckey, 'hash': hash, '_name': 'getLinkFileDownload'})
+            url = getUrl('https://disk.yandex.com/handlers.jsx', post=post).result
+            url = json.loads(url)['data']['url']
             url = getUrl(url, output='geturl').result
-
             return url
         except:
             pass
 
         try:
-            grifthost = re.findall('.*href="(http://grifthost.com/.+?)".+?<img', r, re.I)[0]
-            grifthost = common.replaceHTMLCodes(grifthost)
+            mailru = common.parseDOM(r, "a", ret="href", attrs = { "id": "dm\d+" })
+            mailru = [i for i in mailru if '/cloud.mail.ru/' in i][0]
+
+            result = getUrl(mailru, close=False).result
+            url = re.compile('"get": "(.+?)"').findall(result)[0]
+            url = '%s|Referer=%s' % (url, urllib.quote_plus(mailru))
+            return url
+        except:
+            pass
+
+        try:
+            grifthost = common.parseDOM(r, "a", ret="href", attrs = { "id": "dm\d+" })
+            grifthost = [i for i in grifthost if '/grifthost.com/' in i][0]
 
             url = getUrl(grifthost, output='geturl').result
             if url == grifthost: raise Exception()
-
             return url
         except:
             pass
