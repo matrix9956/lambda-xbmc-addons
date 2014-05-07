@@ -1,4 +1,14 @@
 ------------------------
+Hellenic TV v2.6.4 (7-May-14)
+------------------------
+
+- Added NERIT, LAMPSI TV, ALPHA GATV, DR TV, SUPER 28, TVS and KANALI 6.
+- Updated STAR, RIK SAT, GREEK CINEMA and DIRAS TV.
+- Removed EDT.
+- Code cosmetics.
+
+
+------------------------
 Hellenic TV v2.6.3 (2-May-14)
 ------------------------
 

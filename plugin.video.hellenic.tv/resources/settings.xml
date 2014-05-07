@@ -11,7 +11,7 @@
 		<setting id="MACEDONIA TV" label="MACEDONIA TV" type="bool" default="true" visible="true"/>
 		<setting id="NET" label="NET" type="bool" default="true" visible="false"/>
 		<setting id="ET3" label="ET3" type="bool" default="true" visible="true"/>
-		<setting id="EDT" label="EDT" type="bool" default="true" visible="true"/>
+		<setting id="NERIT" label="NERIT" type="bool" default="true" visible="true"/>
 		<setting id="BOYLH TV" label="BOYLH TV" type="bool" default="true" visible="true"/>
 		<setting id="EURONEWS" label="EURONEWS" type="bool" default="true" visible="true"/>
 	</category>
@@ -31,6 +31,8 @@
 		<setting id="MAD TV" label="MAD TV" type="bool" default="true" visible="true"/>
 		<setting id="MUSIC TV" label="MUSIC TV" type="bool" default="true" visible="true"/>
 		<setting id="GREEK CINEMA" label="GREEK CINEMA" type="bool" default="true" visible="true"/>
+		<setting id="LAMPSI TV" label="LAMPSI TV" type="bool" default="true" visible="true"/>
+		<setting id="ALPHA GATV" label="ALPHA GATV" type="bool" default="true" visible="true"/>
 		<setting id="CY SPORTS" label="CY SPORTS" type="bool" default="true" visible="true"/>
 		<setting id="ODIE TV" label="ODIE TV" type="bool" default="true" visible="true"/>
 	</category>
@@ -94,7 +96,7 @@
 		<!-- EAST PELOPONNESE -->
 		<setting id="ELLADA TV" label="ELLADA TV" type="bool" default="true" visible="true"/>
 		<setting id="ELECTRA TV" label="ELECTRA TV" type="bool" default="true" visible="false"/>
-		<setting id="DR TV" label="DR TV" type="bool" default="true" visible="false"/>
+		<setting id="DR TV" label="DR TV" type="bool" default="true" visible="true"/>
 		<setting id="AXION TV" label="AXION TV" type="bool" default="true" visible="false"/>
 		<setting id="SUPER TV" label="SUPER TV" type="bool" default="true" visible="false"/>
 		<setting id="MAX TV" label="MAX TV" type="bool" default="true" visible="false"/>
@@ -128,7 +130,7 @@
 		<setting id="FLASH TV" label="FLASH TV" type="bool" default="true" visible="true"/>
 		<setting id="TOP CHANNEL" label="TOP CHANNEL" type="bool" default="true" visible="true"/>
 		<setting id="TRM" label="TRM" type="bool" default="true" visible="false"/>
-		<setting id="SUPER 28" label="SUPER 28" type="bool" default="true" visible="false"/>
+		<setting id="SUPER 28" label="SUPER 28" type="bool" default="true" visible="true"/>
 		<!-- EAST MACEDONIA -->
 		<setting id="DIKTYO TV" label="DIKTYO TV" type="bool" default="true" visible="true"/>
 		<setting id="TELE EPILOGES" label="TELE EPILOGES" type="bool" default="true" visible="true"/>
@@ -136,13 +138,13 @@
 		<setting id="STAR TV DRAMA" label="STAR TV DRAMA" type="bool" default="true" visible="true"/>
 		<setting id="CENTER TV" label="CENTER TV" type="bool" default="true" visible="false"/>
 		<setting id="ALFA TV" label="ALFA TV" type="bool" default="true" visible="false"/>
-		<setting id="TVS" label="TVS" type="bool" default="true" visible="false"/>
+		<setting id="TVS" label="TVS" type="bool" default="true" visible="true"/>
 		<setting id="TV DELTA" label="TV DELTA" type="bool" default="true" visible="false"/>
 		<!-- THRACE -->
 		<setting id="DELTA TV" label="DELTA TV" type="bool" default="true" visible="true"/>
 		<setting id="THRAKI NET" label="THRAKI NET" type="bool" default="true" visible="true"/>
 		<setting id="R CHANNEL" label="R CHANNEL" type="bool" default="true" visible="true"/>
-		<setting id="KANALI 6" label="KANALI 6" type="bool" default="false" visible="false"/>
+		<setting id="KANALI 6" label="KANALI 6" type="bool" default="false" visible="true"/>
 		<setting id="ORESTIADA TV" label="ORESTIADA TV" type="bool" default="false" visible="false"/>
 		<setting id="HOME SHOP" label="HOME SHOP" type="bool" default="false" visible="false"/>
 	</category>

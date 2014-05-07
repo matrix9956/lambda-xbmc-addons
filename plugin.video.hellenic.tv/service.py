@@ -430,7 +430,7 @@ class epg:
             'ALPHA'                     : self.ote_programme("ALPHA", "132"),
             'SKAI'                      : self.ote_programme("SKAI", "120"),
             'MACEDONIA TV'              : self.ote_programme("MACEDONIA TV", "152"),
-            'EDT'                       : self.ote_programme("EDT", "593"),
+            'NERIT'                     : self.ote_programme("NERIT", "593"),
             'BOYLH TV'                  : self.ote_programme("BOYLH TV", "119"),
             'EURONEWS'                  : self.ote_programme("EURONEWS", "19"),
             #'NICKELODEON'              : self.ote_programme("NICKELODEON", "117"),

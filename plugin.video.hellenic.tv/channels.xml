@@ -5,8 +5,8 @@
 			<name>MEGA</name>
 			<type>hls</type>
 			<url>http://megahdlive1-f.akamaihd.net/i/live_1@105260/master.m3u8</url>
-			<type2></type2>
-			<url2>rtmpe://80.82.70.225:443/liveedge1 playpath=mega765 pageUrl=http://xuscacamusca.se live=1 timeout=10</url2>
+			<type2>ustream</type2>
+			<url2>http://www.ustream.tv/channel/mobile0001</url2>
 			<base>http://www.megatv.com/webtv</base>
 			<epg>30501</epg>
 		</channel>
@@ -14,15 +14,15 @@
 			<name>ANT1</name>
 			<type>hls</type>
 			<url>http://wow.ant1.gr:1935/live/smil:mavani.smil/playlist.m3u8</url>
-			<type2></type2>
-			<url2>rtmpe://80.82.70.225:443/liveedge1 playpath=ant1386 pageUrl=http://xuscacamusca.se live=1 timeout=10</url2>
+			<type2>ustream</type2>
+			<url2>http://www.ustream.tv/channel/mobile003</url2>
 			<base>http://www.antenna.gr/webtv/doubleip/live</base>
 			<epg>30502</epg>
 		</channel>
 		<channel active="True">
 			<name>STAR</name>
-			<type></type>
-			<url>rtmpe://80.82.70.225:443/liveedge1 playpath=star174 pageUrl=http://xuscacamusca.se live=1 timeout=10</url>
+			<type>ustream</type>
+			<url>http://www.ustream.tv/channel/mobile0000</url>
 			<base></base>
 			<epg>30503</epg>
 		</channel>
@@ -71,11 +71,9 @@
 			<epg>30509</epg>
 		</channel>
 		<channel active="True">
-			<name>EDT</name>
+			<name>NERIT</name>
 			<type>visionip</type>
 			<url>http://tvnetwork.new.visionip.tv/Hellenic_TV/index.php?module=playlist&amp;type=jwASX&amp;broadcastid=4267</url>
-			<type2></type2>
-			<url2>mmsh://magictvbox.us:200/dt</url2>
 			<base>http://www.hprt.gr/</base>
 			<epg>30510</epg>
 		</channel>
@@ -128,9 +126,11 @@
 		</channel>
 		<channel active="True">
 			<name>RIK SAT</name>
-			<type>hls</type>
-			<url>http://cdn106nl.webvideocore.net/livenl/epfeao2vff48kskgs4wk/index.m3u8</url>
+			<type>visionip</type>
+			<url>http://tvnetwork.new.visionip.tv/Hellenic_TV/index.php?module=playlist&amp;type=jwASX&amp;broadcastid=4264</url>
 			<base>http://www.cybc.com.cy/index.php/watch-live</base>
+			<type2>hls</type2>
+			<url2>http://player.webvideocore.net/3vszn3e79hwk.m3u8</url2>
 			<epg>30525</epg>
 		</channel>
 	</area>
@@ -173,24 +173,38 @@
 		</channel>
 		<channel active="True">
 			<name>GREEK CINEMA</name>
-			<type></type>
-			<url>rtmp://37.48.66.244:80/cinema playpath=cinema.sdp pageUrl=http://www.kanalia.eu/ live=1 timeout=10</url>
-			<base>http://kanalia.eu/player/player.php?channel=105</base>
+			<type>justin</type>
+			<url>http://www.justin.tv/zuganelis</url>
+			<base>http://www.justin.tv/zuganelis</base>
 			<epg>30546</epg>
+		</channel>
+		<channel active="True">
+			<name>LAMPSI TV</name>
+			<type></type>
+			<url>http://livestream-f.akamaihd.net/i/1044356_2098315_7adf5fc7_1@68991/index_524_av-p.m3u8</url>
+			<base>http://www.gamostv.eu/</base>
+			<epg>30547</epg>
+		</channel>
+		<channel active="True">
+			<name>ALPHA GATV</name>
+			<type>hls</type>
+			<url>http://player.stream.hostworks.com.au/alpha_dyn.m3u8</url>
+			<base>http://alphagatv.com.au/</base>
+			<epg>30548</epg>
 		</channel>
 		<channel active="True">
 			<name>CY SPORTS</name>
 			<type>hls</type>
 			<url>http://stream.livenews.com.cy/cysports.isml/manifest(format=m3u8-aapl).m3u8</url>
 			<base>http://cysports.tv/</base>
-			<epg>30547</epg>
+			<epg>30549</epg>
 		</channel>
 		<channel active="True">
 			<name>ODIE TV</name>
 			<type>ustream</type>
 			<url>http://www.ustream.tv/channel/odie-tv-live</url>
 			<base>http://www.odie.tv/</base>
-			<epg>30548</epg>
+			<epg>30550</epg>
 		</channel>
 	</area>
 
@@ -241,14 +255,14 @@
 		<channel active="False">
 			<name>ATTICA TV</name>
 			<type>http</type>
-			<url>http://85.196.8.204:1234/udp/225.170.93.224:1234</url>
-			<base></base>
+			<url>mmsh://wifi.dyndns.tv:8080/</url>
+			<base>http://youatticatv.blogspot.gr/</base>
 			<epg>30567</epg>
 		</channel>
 		<channel active="False">
 			<name>HIGH TV</name>
 			<type>http</type>
-			<url>http://85.196.8.204:1234/udp/225.170.94.64:1234</url>
+			<url></url>
 			<base>http://skaisat.com/highchannel/</base>
 			<epg>30568</epg>
 		</channel>
@@ -277,7 +291,7 @@
 			<name>SMILE TV</name>
 			<type></type>
 			<url></url>
-			<base></base>
+			<base>http://tvsmile.gr/</base>
 			<epg>30572</epg>
 		</channel>
 	</area>
@@ -314,7 +328,7 @@
 		<channel active="False">
 			<name>GNOMI TV</name>
 			<type>http</type>
-			<url>http://85.196.8.204:1234/udp/225.170.92.96:1234</url>
+			<url></url>
 			<base>http://www.gnominet.gr/</base>
 			<epg>30585</epg>
 		</channel>
@@ -364,7 +378,7 @@
 			<name>EURO CHANNEL</name>
 			<type></type>
 			<url></url>
-			<base></base>
+			<base>http://eurotileorasi.eu/</base>
 			<epg>30592</epg>
 		</channel>
 		<channel active="False">
@@ -542,8 +556,8 @@
 		</channel>
 		<channel active="False">
 			<name>IONIAN CHANNEL</name>
-			<type>livestream</type>
-			<url>http://www.livestream.com/erzzante</url>
+			<type>ustream</type>
+			<url>http://www.ustream.tv/channel/ionian-channel</url>
 			<base>http://ioniantv.gr/</base>
 			<epg>30667</epg>
 		</channel>
@@ -578,10 +592,10 @@
 			<base>http://www.pelopas.gr/</base>
 			<epg>30682</epg>
 		</channel>
-		<channel active="False">
+		<channel active="True">
 			<name>DR TV</name>
-			<type></type>
-			<url></url>
+			<type>livestream</type>
+			<url>http://www.livestream.com/drtvhellas</url>
 			<base>http://www.drtv.gr/</base>
 			<epg>30683</epg>
 		</channel>
@@ -706,7 +720,7 @@
 		<channel active="True">
 			<name>DIRAS TV</name>
 			<type></type>
-			<url>rtmp://www.cityofkos.gr/diras/livetv live=1 timeout=10</url>
+			<url>rtmp://www.cityofkos.gr/live/livetv live=1 timeout=10</url>
 			<base>http://www.diras.gr/</base>
 			<epg>30725</epg>
 		</channel>
@@ -745,7 +759,7 @@
 			<name>ALITHIA TV</name>
 			<type></type>
 			<url></url>
-			<base>http://alithia.cloudshops.gr/tv</base>
+			<base>http://www.alithia.gr/</base>
 			<epg>30743</epg>
 		</channel>
 	</area>
@@ -796,10 +810,10 @@
 			<base>http://www.grevenatv.gr/</base>
 			<epg>30784</epg>
 		</channel>
-		<channel active="False">
+		<channel active="True">
 			<name>SUPER 28</name>
 			<type></type>
-			<url></url>
+			<url>mmsh://live.onestreaming.com/super28</url>
 			<base>http://grevenamedia.gr/</base>
 			<epg>30785</epg>
 		</channel>
@@ -848,13 +862,14 @@
 			<base>http://www.alfadramas.gr/</base>
 			<epg>30806</epg>
 		</channel>
-		<channel active="False">
+		<channel active="True">
 			<name>TVS</name>
 			<type></type>
-			<url></url>
+			<url>rtmp://eco.caststream.net/serrestv/serrestv live=1 timeout=10</url>
 			<base>http://www.tvserres.tv/</base>
 			<epg>30807</epg>
 		</channel>
+
 		<channel active="False">
 			<name>TV DELTA</name>
 			<type></type>
@@ -886,10 +901,10 @@
 			<base>http://www.tvrodopi.gr/</base>
 			<epg>30823</epg>
 		</channel>
-		<channel active="False">
+		<channel active="True">
 			<name>KANALI 6</name>
-			<type></type>
-			<url></url>
+			<type>ustream</type>
+			<url>http://www.ustream.tv/channel/k-6</url>
 			<base>http://www.kanali6.gr/</base>
 			<epg>30824</epg>
 		</channel>

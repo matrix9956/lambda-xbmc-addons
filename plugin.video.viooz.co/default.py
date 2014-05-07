@@ -764,8 +764,9 @@ class contextMenu:
                             file.close()
                             line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
                             line2 = line.replace('"0"', '"%s"' % new_imdb).replace('"%s"' % imdb, '"%s"' % new_imdb)
-                            file = open(source, 'w')
-                            file.write(read.replace(line, line2))
+                            write = read.replace(line, line2)
+                            file = xbmcvfs.File(source, 'w')
+                            file.write(str(write))
                             file.close()
                         except:
                             pass
@@ -952,6 +953,7 @@ class root:
         rootList.append({'name': 30523, 'image': 'Directors.png', 'action': 'movies_directors_search'})
         index().rootList(rootList)
 
+
 class link:
     def __init__(self):
         self.viooz_base = 'http://viooz.co'
@@ -969,12 +971,22 @@ class link:
         self.viooz_languages = 'http://viooz.co/language/'
 
 class proxy:
-    def result(self, url):
-        try: return getUrl('http://9proxy.in/b.php?u=%s&b=12' % urllib.quote_plus(urllib.unquote_plus(url)), referer='http://9proxy.in', timeout='30').result
-        except: return
+    def getUrl(self, url):
+        try:
+            result = ''
+            result = getUrl(url).result
+        except:
+            pass
+        try:
+            if not '"menu_categorie"' in result:
+                result = getUrl('http://9proxy.in/b.php?u=%s&b=12' % urllib.quote_plus(urllib.unquote_plus(url)), referer='http://9proxy.in', timeout='30').result
+            return result
+        except:
+            pass
 
     def redirect(self, url):
-        return urllib.unquote_plus(url.split('/b.php?u=', 1)[-1].split('&amp;', 1)[0])
+        url = urllib.unquote_plus(url.split('/b.php?u=', 1)[-1].split('&amp;', 1)[0])
+        return url
 
 class pages:
     def __init__(self):
@@ -987,9 +999,7 @@ class pages:
 
     def viooz_list(self):
         try:
-            result = getUrl(link().viooz_pages, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(link().viooz_pages)
-
+            result = proxy().getUrl(link().viooz_pages)
             result = common.parseDOM(result, "div", attrs = { "id": "tree_title_type" })[0]
             pages = re.compile('(<a.+?</a>)').findall(result)
         except:
@@ -1003,7 +1013,6 @@ class pages:
 
                 url = common.parseDOM(page, "a", ret="href")[0]
                 url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1027,9 +1036,7 @@ class genres:
 
     def viooz_list(self):
         try:
-            result = getUrl(link().viooz_genres, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(link().viooz_genres)
-
+            result = proxy().getUrl(link().viooz_genres)
             result = common.parseDOM(result, "div", attrs = { "class": "content" })[0]
             genres = re.compile('(<a.+?</a>)').findall(result)
         except:
@@ -1043,7 +1050,6 @@ class genres:
 
                 url = common.parseDOM(genre, "a", ret="href")[0]
                 url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1067,9 +1073,7 @@ class years:
 
     def viooz_list(self):
         try:
-            result = getUrl(link().viooz_years, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(link().viooz_years)
-
+            result = proxy().getUrl(link().viooz_years)
             result = common.parseDOM(result, "div", attrs = { "class": "content" })[0]
             years = re.compile('(<a.+?</a>)').findall(result)
         except:
@@ -1083,7 +1087,6 @@ class years:
 
                 url = common.parseDOM(year, "a", ret="href")[0]
                 url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1107,9 +1110,7 @@ class countries:
 
     def viooz_list(self):
         try:
-            result = getUrl(link().viooz_countries, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(link().viooz_countries)
-
+            result = proxy().getUrl(link().viooz_countries)
             result = common.parseDOM(result, "div", attrs = { "class": "content" })[0]
             countries = re.compile('(<a.+?</a>)').findall(result)
         except:
@@ -1123,7 +1124,6 @@ class countries:
 
                 url = common.parseDOM(country, "a", ret="href")[0]
                 url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1147,9 +1147,7 @@ class languages:
 
     def viooz_list(self):
         try:
-            result = getUrl(link().viooz_languages, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(link().viooz_languages)
-
+            result = proxy().getUrl(link().viooz_languages)
             result = common.parseDOM(result, "div", attrs = { "class": "content" })[0]
             languages = re.compile('(<a.+?</a>)').findall(result)
         except:
@@ -1163,7 +1161,6 @@ class languages:
 
                 url = common.parseDOM(language, "a", ret="href")[0]
                 url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1237,9 +1234,7 @@ class movies:
 
     def viooz_list(self, url):
         try:
-            result = getUrl(url, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(url)
-
+            result = proxy().getUrl(url)
             result = result.decode('iso-8859-1').encode('utf-8')
             movies = result.split('class="film boxed film_grid"')
         except:
@@ -1266,8 +1261,8 @@ class movies:
                 year = year.encode('utf-8')
 
                 name = '%s (%s)' % (title, year)
-                name = common.replaceHTMLCodes(name)
-                name = name.encode('utf-8')
+                try: name = name.encode('utf-8')
+                except: pass
 
                 url = common.parseDOM(movie, "a", ret="href")[0]
                 url = proxy().redirect(url)
@@ -1401,38 +1396,147 @@ class resolver:
 
     def viooz(self, url):
         try:
-            result = ''
-            result = getUrl(url, timeout='30').result
-            if not '"menu_categorie"' in result: result = proxy().result(url)
+            r = proxy().getUrl(url)
+            if r is None: raise Exception()
+        except:
+            return
 
-            try:
-                url = common.parseDOM(result, "source", ret="src", attrs = { "type": "video/.+?" })[0]
-                url = proxy().redirect(url)
-                if not url.startswith(link().viooz_base): url = '%s%s' % (link().viooz_base, url)
-                url = common.replaceHTMLCodes(url)
-            except:
-                import decrypter
-                url = re.compile('proxy[.]link=viooz[*](.+?)&').findall(result)[0]
-                url = common.replaceHTMLCodes(url)
-                url = decrypter.decrypter(198,128).decrypt(url,base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='),'ECB').split('\0')[0]
-
-                result = getUrl(url).result
-                url = common.parseDOM(result, "link", ret="href", attrs = { "rel": "alternate" })[0]
-                url = common.replaceHTMLCodes(url)
-
-                result = getUrl(url).result
-                url = common.parseDOM(result, "media:content", ret="url")
-                url = [common.replaceHTMLCodes(i) for i in url]
-                url = [i for i in url if 'videoplayback?' in i]
-                try: url = [i for i in url if not any(x in i for x in ['&itag=43&', '&itag=35&', '&itag=34&', '&itag=5&'])][-1]
-                except: url = url[-1]
-
+        try:
+            url = common.parseDOM(r, "source", ret="src", attrs = { "type": "video/.+?" })[0]
+            url = proxy().redirect(url)
+            url = common.replaceHTMLCodes(url)
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
             else: url = url.replace('https://', 'http://')
             return url
         except:
+            pass
+
+        try:
+            url = common.parseDOM(r, "iframe", ret="src")
+            url = [proxy().redirect(i) for i in url]
+            url = [i for i in url if 'movshare.net' in i][0]
+
+            url = url.rsplit('/', 1)[-1].rsplit('?v=', 1)[-1]
+            url = 'http://www.movshare.net/mobile/ajax.php?videoId=%s' % url
+
+            result = getUrl(url, mobile=True).result
+            url = re.compile('"download":"(.+?)"').findall(result)[0]
+            url = 'http://www.movshare.net/mobile/%s' % url
+
+            url = getUrl(url, output='geturl', mobile=True).result
+            return url
+        except:
+            pass
+
+        try:
+            raise Exception()
+            import decrypter
+            import hashlib, random
+
+            url = re.compile('proxy[.]link=viooz[*](.+?)&').findall(r)[0]
+            url = decrypter.decrypter(198,128).decrypt(url,base64.urlsafe_b64decode('YVhWN09hU0M4MDRWYXlUQ0lPYmE='),'ECB').split('\0')[0]
+
+            v = url.rsplit('/', 1)[-1]
+            t = str(random.randint(1000000000,9999999999))
+            c = str(hashlib.sha1(url).hexdigest() + hashlib.sha1(url).hexdigest() + hashlib.sha1(url).hexdigest() + hashlib.sha1(url).hexdigest())[:96]
+            url = 'http://gs.video.tt/s?v=%s&r=0&t=%s&u=&c=%s&start=0' % (v, t, c)
+            request = urllib2.Request(url,None)
+            request.add_header('User-Agent', '')
+            response = urllib2.urlopen(request, timeout=10)
+            type = str(response.headers.get('Content-Type'))
+            response.close()
+
+            if type == 'video/x-flv': raise Exception()
+            return url
+        except:
+            pass
+
+        try:
+            imdb = common.parseDOM(r, "div", attrs = { "class": "imdb" })[0]
+            imdb = common.parseDOM(imdb, "a", ret="href")[0]
+            imdb = proxy().redirect(imdb)
+            imdb = re.findall('/tt(\d+)', imdb, re.I)[0]
+            name = common.parseDOM(r, "h2", attrs = { "class": "title_font" })[0]
+            name = common.parseDOM(name, "span")[-1]
+            year = re.compile('[(](\d{4})[)]').findall(name)[-1]
+            title = re.compile('(.+?)[(]\d{4}[)]').findall(name)[0]
+            title = common.replaceHTMLCodes(title)
+            title = title.strip()
+
+            url = self.movie25(title, year, imdb)
+            return url
+        except:
+            pass
+
+    def movie25(self, title, year, imdb):
+        hostDict = ['Firedrive', 'Putlocker', 'Sockshare', 'Played', 'Promptfile', 'Mightyupload', 'Gorillavid', 'Divxstage', 'Movreel', 'Bestreams', 'Flashx', 'Vidbull', 'Daclips', 'Movpod', 'Nosvideo', 'Novamov', 'Vidx', 'Sharesix', 'Videoweed', 'Sharerepo', 'Uploadc', 'Filenuke']
+        self.base_link = 'http://www.movie25.so'
+        self.search_link = 'http://www.movie25.so/search.php?key=%s'
+
+        try:
+            movie25_sources = []
+
+            query = self.search_link % urllib.quote_plus(title)
+
+            result = getUrl(query).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            result = common.parseDOM(result, "div", attrs = { "class": "movie_table" })[0]
+            result = common.parseDOM(result, "li")
+
+            match = [i for i in result if any(x in i for x in [' (%s)' % str(year), ' (%s)' % str(int(year)+1), ' (%s)' % str(int(year)-1)])]
+            match2 = [self.base_link + common.parseDOM(i, "a", ret="href")[0] for i in match]
+            if match2 == []: return
+            for i in match2[:10]:
+                try:
+                    result = getUrl(i).result
+                    result = result.decode('iso-8859-1').encode('utf-8')
+                    if str('tt' + imdb) in result:
+                        match3 = result
+                        break
+                except:
+                    pass
+
+            result = common.parseDOM(match3, "div", attrs = { "class": "links_quality" })[0]
+            links = common.parseDOM(result, "ul")
+            for i in links:
+                try:
+                    name = common.parseDOM(i, "a")[0]
+                    name = common.replaceHTMLCodes(name)
+                    if name.isdigit(): raise Exception()
+                    host = common.parseDOM(i, "li", attrs = { "class": "link_name" })[0]
+                    host = common.replaceHTMLCodes(host)
+                    host = host.encode('utf-8')
+                    host = [x for x in hostDict if host.lower() == x.lower()][0]
+                    url = common.parseDOM(i, "a", ret="href")[0]
+                    url = '%s%s' % (self.base_link, url)
+                    url = common.replaceHTMLCodes(url)
+                    url = url.encode('utf-8')
+                    movie25_sources.append({'source': host, 'url': url})
+                except:
+                    pass
+
+            filter = []
+            for host in hostDict: filter += [i for i in movie25_sources if i['source'].lower() == host.lower()]
+            movie25_sources = filter
+        except:
             return
+
+        for i in movie25_sources:
+            try:
+                result = getUrl(i['url']).result
+                result = result.decode('iso-8859-1').encode('utf-8')
+                url = common.parseDOM(result, "input", ret="onclick")
+                url = [i for i in url if 'location.href' in i and 'http://' in i][0]
+                url = url.split("'", 1)[-1].rsplit("'", 1)[0]
+
+                import urlresolver
+                resolver = urlresolver.resolve(url)
+                xbmc.sleep(1000)
+                if not resolver.startswith('http://'): raise Exception()
+                if not resolver == url: return resolver
+            except:
+                pass
 
 
 main()

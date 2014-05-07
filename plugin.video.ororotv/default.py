@@ -131,12 +131,12 @@ class main:
         elif action == 'download':                  contextMenu().download(name, url)
         elif action == 'shows_favourites':          favourites().shows()
         elif action == 'shows_subscriptions':       subscriptions().shows()
-        elif action == 'shows':                     shows().ororo_genre(url)
-        elif action == 'shows_title':               shows().ororo_title()
-        elif action == 'shows_release':             shows().ororo_release()
-        elif action == 'shows_rating':              shows().ororo_rating()
-        elif action == 'shows_search':              shows().ororo_search(query)
-        elif action == 'genres_shows':              genres().ororo()
+        elif action == 'shows':                     shows().genre(url)
+        elif action == 'shows_title':               shows().title()
+        elif action == 'shows_release':             shows().release()
+        elif action == 'shows_rating':              shows().rating()
+        elif action == 'shows_search':              shows().search(query)
+        elif action == 'genres_shows':              genres().get()
         elif action == 'seasons':                   seasons().get(url, image, year, imdb, genre, plot, show)
         elif action == 'episodes':                  episodes().get(name, url, image, year, imdb, genre, plot, show)
         elif action == 'play':                      resolver().run(url, name)
@@ -239,7 +239,7 @@ class player(xbmc.Player):
             item.setInfo( type="Video", infoLabels= meta )
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
 
-        for i in range(1, 21):
+        for i in range(0, 250):
             try: self.totalTime = self.getTotalTime()
             except: self.totalTime = 0
             if not self.totalTime == 0: continue
@@ -261,10 +261,25 @@ class player(xbmc.Player):
         self.episode = '%01d' % int(name.rsplit(' ', 1)[-1].split('E')[-1])
         self.subtitle = subtitles().get(self.name, self.imdb, self.season, self.episode)
 
+    def container_refresh(self):
+        try:
+            params = {}
+            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
+            for i in query: params[i.split('=')[0]] = i.split('=')[1]
+            if not params["action"].endswith('_search'): index().container_refresh()
+        except:
+            pass
+
     def offset_add(self):
         try:
-            file = open(offData, 'a+')
-            file.write('"%s"|"%s"|"%s"\n' % (self.name, self.imdb, self.currentTime))
+            file = xbmcvfs.File(offData)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"' % (self.name, self.imdb, self.currentTime))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -274,10 +289,11 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(offData, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (self.name, self.imdb) in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(offData, 'w')
+            file.write(str(write))
             file.close()
         except:
             return
@@ -288,8 +304,8 @@ class player(xbmc.Player):
             file = xbmcvfs.File(offData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"|"%s"' % (self.name, self.imdb) in x][0]
-            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(line)[0]
+            read = [i for i in read.splitlines(True) if '"%s"|"%s"|"' % (self.name, self.imdb) in i][0]
+            self.offset = re.compile('".+?"[|]".+?"[|]"(.+?)"').findall(read)[0]
         except:
             return
 
@@ -298,15 +314,6 @@ class player(xbmc.Player):
             xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "VideoLibrary.SetEpisodeDetails", "params": {"episodeid" : %s, "playcount" : 1 }, "id": 1 }' % str(self.meta['episodeid']))
         except:
             metaget.change_watched(self.content, '', self.imdb, season=self.season, episode=self.episode, year='', watched=7)
-
-    def container_refresh(self):
-        try:
-            params = {}
-            query = self.folderPath[self.folderPath.find('?') + 1:].split('&')
-            for i in query: params[i.split('=')[0]] = i.split('=')[1]
-            if not params["action"].endswith('_search'): index().container_refresh()
-        except:
-            pass
 
     def resume_playback(self):
         offset = float(self.offset)
@@ -821,10 +828,12 @@ class contextMenu:
             file = xbmcvfs.File(viewData)
             read = file.read()
             file.close()
-            file = open(viewData, 'w')
-            for line in re.compile('(".+?\n)').findall(read):
-                if not line.startswith('"%s"|"%s"|"' % (skin, content)): file.write(line)
-            file.write('"%s"|"%s"|"%s"\n' % (skin, content, str(view)))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"|"%s"|"' % (skin, content) in i]
+            write.append('"%s"|"%s"|"%s"' % (skin, content, str(view)))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(viewData, 'w')
+            file.write(str(write))
             file.close()
             viewName = xbmc.getInfoLabel('Container.Viewmode')
             index().infoDialog('%s%s%s' % (language(30301).encode("utf-8"), viewName, language(30302).encode("utf-8")))
@@ -834,8 +843,14 @@ class contextMenu:
     def favourite_add(self, data, name, url, image, imdb, year):
         try:
             index().container_refresh()
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"|"%s"\n' % (name, year, imdb, url, image))
+            file = xbmcvfs.File(data)
+            read = file.read()
+            file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"|"%s"' % (name, year, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -846,11 +861,14 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            if url in read:
+            if '"%s"' % url in read:
                 index().infoDialog(language(30307).encode("utf-8"), name)
                 return
-            file = open(data, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"|"%s"\n' % (name, year, imdb, url, image))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"|"%s"' % (name, year, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30303).encode("utf-8"), name)
         except:
@@ -862,10 +880,11 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(data, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"' % url in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30304).encode("utf-8"), name)
         except:
@@ -877,13 +896,13 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
             if i == 0 : return
-            list[i], list[i-1] = list[i-1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write[i], write[i-1] = write[i-1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30305).encode("utf-8"), name)
         except:
@@ -895,30 +914,39 @@ class contextMenu:
             file = xbmcvfs.File(data)
             read = file.read()
             file.close()
-            list = re.compile('(".+?)\n').findall(read)
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            i = list.index(line)
-            if i+1 == len(list): return
-            list[i], list[i+1] = list[i+1], list[i]
-            file = open(data, 'w')
-            for line in list: file.write('%s\n' % (line))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            i = write.index([i for i in write if '"%s"' % url in i][0])
+            if i+1 == len(write): return
+            write[i], write[i+1] = write[i+1], write[i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(data, 'w')
+            file.write(str(write))
             file.close()
             index().infoDialog(language(30306).encode("utf-8"), name)
         except:
             return
 
-    def subscription_add(self, name, url, image, imdb, year):
+    def subscription_add(self, name, url, image, imdb, year, silent=False):
         try:
             status = metaget.get_meta('tvshow', name, imdb_id=imdb)['status']
             if status == 'Ended':
             	yes = index().yesnoDialog(language(30347).encode("utf-8"), language(30348).encode("utf-8"), name)
             	if not yes: return
-            file = open(subData, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"|"%s"\n' % (name, year, imdb, url, image))
+
+            file = xbmcvfs.File(subData)
+            read = file.read()
             file.close()
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"|"%s"' % (name, year, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(subData, 'w')
+            file.write(str(write))
+            file.close()
+
             self.library(name, url, imdb, year, silent=True)
-            index().container_refresh()
-            index().infoDialog(language(30312).encode("utf-8"), name)
+            if silent == False:
+                index().container_refresh()
+                index().infoDialog(language(30312).encode("utf-8"), name)
         except:
             return
 
@@ -927,15 +955,18 @@ class contextMenu:
             file = xbmcvfs.File(subData)
             read = file.read()
             file.close()
-            if url in read:
+            if '"%s"' % url in read:
                 index().infoDialog(language(30316).encode("utf-8"), name)
                 return
             status = metaget.get_meta('tvshow', name, imdb_id=imdb)['status']
             if status == 'Ended':
             	yes = index().yesnoDialog(language(30347).encode("utf-8"), language(30348).encode("utf-8"), name)
             	if not yes: return
-            file = open(subData, 'a+')
-            file.write('"%s"|"%s"|"%s"|"%s"|"%s"\n' % (name, year, imdb, url, image))
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write.append('"%s"|"%s"|"%s"|"%s"|"%s"' % (name, year, imdb, url, image))
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(subData, 'w')
+            file.write(str(write))
             file.close()
             self.library(name, url, imdb, year, silent=True)
             index().infoDialog(language(30312).encode("utf-8"), name)
@@ -947,10 +978,11 @@ class contextMenu:
             file = xbmcvfs.File(subData)
             read = file.read()
             file.close()
-            line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
-            list = re.compile('(".+?\n)').findall(read.replace(line, ''))
-            file = open(subData, 'w')
-            for line in list: file.write(line)
+            write = [i.strip('\n').strip('\r') for i in read.splitlines(True) if i.strip('\r\n')]
+            write = [i for i in write if not '"%s"' % url in i]
+            write = '\r\n'.join(write)
+            file = xbmcvfs.File(subData, 'w')
+            file.write(str(write))
             file.close()
 
             yes = index().yesnoDialog(language(30351).encode("utf-8"), language(30352).encode("utf-8"), name)
@@ -1039,8 +1071,9 @@ class contextMenu:
                             file.close()
                             line = [x for x in re.compile('(".+?)\n').findall(read) if '"%s"' % url in x][0]
                             line2 = line.replace('"0"', '"%s"' % new_imdb).replace('"%s"' % imdb, '"%s"' % new_imdb)
-                            file = open(source, 'w')
-                            file.write(read.replace(line, line2))
+                            write = read.replace(line, line2)
+                            file = xbmcvfs.File(source, 'w')
+                            file.write(str(write))
                             file.close()
                         except:
                             pass
@@ -1249,7 +1282,7 @@ class genres:
     def __init__(self):
         self.list = []
 
-    def ororo(self):
+    def get(self):
         #self.list = self.ororo_list()
         self.list = cache3(self.ororo_list)
         self.list = sorted(self.list, key=itemgetter('name'))
@@ -1288,31 +1321,31 @@ class shows:
     def __init__(self):
         self.list = []
 
-    def ororo_title(self):
+    def title(self):
         #self.list = self.ororo_list()
         self.list = cache(self.ororo_list)
         self.list = sorted(self.list, key=itemgetter('name'))
         index().showList(self.list)
 
-    def ororo_release(self):
+    def release(self):
         #self.list = self.ororo_list()
         self.list = cache(self.ororo_list)
         self.list = sorted(self.list, key=itemgetter('sort'))
         self.list = self.list[::-1]
         index().showList(self.list)
 
-    def ororo_rating(self):
+    def rating(self):
         #self.list = self.ororo_list()
         self.list = cache(self.ororo_list)
         index().showList(self.list)
 
-    def ororo_genre(self, url):
+    def genre(self, url):
         #self.list = self.ororo_list()
         self.list = cache(self.ororo_list)
         self.list = [i for i in self.list if url.lower() in i['genre'].lower()]
         index().showList(self.list)
 
-    def ororo_search(self, query=None):
+    def search(self, query=None):
         if query is None:
             self.query = common.getUserInput(language(30362).encode("utf-8"), '')
         else:

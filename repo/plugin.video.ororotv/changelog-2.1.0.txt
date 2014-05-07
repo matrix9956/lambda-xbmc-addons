@@ -1,4 +1,14 @@
 ------------------------
+Ororo TV v2.1.0 (7-May-14)
+------------------------
+
+- Added full remote share support.
+- Fixed playback issues.
+- Tweaked all listings.
+- Code cosmetics.
+
+
+------------------------
 Ororo TV v2.0.4 (31-Mar-14)
 ------------------------
 
