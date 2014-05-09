@@ -11,6 +11,8 @@
 	<!-- OK -->
 	<string id="30321">YouTube addon is not installed.</string>
 	<string id="30322">This stream requires it.</string>
+	<!-- Progress -->
+	<string id="30341">Opening stream</string>
 	<!-- Misc -->
 	<string id="30361">NOW</string>
 	<!-- ContextMenu -->

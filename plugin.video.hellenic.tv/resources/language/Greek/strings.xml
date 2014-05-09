@@ -11,6 +11,8 @@
 	<!-- OK -->
 	<string id="30321">Το πρόσθετο Youtube δεν έχει εγκατασταθεί.</string>
 	<string id="30322">Η ροή αυτή το απαιτεί.</string>
+	<!-- Progress -->
+	<string id="30341">Άνοιγμα ροής</string>
 	<!-- Misc -->
 	<string id="30361">ΤΩΡΑ</string>
 	<!-- ContextMenu -->

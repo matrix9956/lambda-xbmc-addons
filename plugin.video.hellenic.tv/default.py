@@ -391,15 +391,22 @@ class resolver:
                 'action24'          : self.action24,
                 'viiideo'           : self.viiideo,
                 'dailymotion'       : self.dailymotion,
+                'livestream_new'    : self.livestream_new,
                 'livestream'        : self.livestream,
                 'ustream'           : self.ustream,
                 'veetle'            : self.veetle,
                 'justin'            : self.justin
             }
 
+            dialog = xbmcgui.DialogProgress()
+            dialog.create(addonName.encode("utf-8"), language(30341).encode("utf-8"))
+            dialog.update(0)
+
             url = playerDict[type](url)
             if url is None and not type2 == "False": url = playerDict[type2](url2)
             if url is None: url = fallback
+
+            dialog.close()
 
             if not xbmc.getInfoLabel('ListItem.Plot') == '' : epg = xbmc.getInfoLabel('ListItem.Plot')
             title = epg.split('\n')[0].split('-', 1)[-1].rsplit('[', 1)[0].strip()
@@ -445,31 +452,32 @@ class resolver:
 
     def skai(self, url):
         try:
-            if index().addon_status('plugin.video.youtube') is None:
-                index().okDialog(language(30321).encode("utf-8"), language(30322).encode("utf-8"))
-                return
             root = 'http://www.skai.gr/ajax.aspx?m=NewModules.LookupMultimedia&mmid=/Root/TVLive'
             result = getUrl(root).result
             url = common.parseDOM(result, "File")[0]
             url = url.split('[')[-1].split(']')[0]
-            url = 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % url
+            url = 'http://www.youtube.com/watch?v=%s' % url
+
+            result = getUrl(url).result
+            url = re.compile('"hlsvp": "(.+?)"').findall(result)[0]
+            url = urllib.unquote(url).replace('\\/', '/')
             return url
         except:
             return
 
     def madtv(self, url):
         try:
-            if index().addon_status('plugin.video.youtube') is None:
-                index().okDialog(language(30321).encode("utf-8"), language(30322).encode("utf-8"))
-                return
             result = getUrl(url).result
             url = re.compile('.*src="(.+?/youtube/.+?)"').findall(result)[0]
             if url.startswith('//'): url = 'http:' + url
 
             result = getUrl(url).result
             url = re.compile('/embed/(.+?)"').findall(result)[0]
-            url = 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % url
+            url = 'http://www.youtube.com/watch?v=%s' % url
 
+            result = getUrl(url).result
+            url = re.compile('"hlsvp": "(.+?)"').findall(result)[0]
+            url = urllib.unquote(url).replace('\\/', '/')
             return url
         except:
             return
@@ -498,6 +506,16 @@ class resolver:
             quality += '&redirect=0'
             url = getUrl(quality).result
             url = '%s live=1 timeout=10' % url
+            return url
+        except:
+            return
+
+    def livestream_new(self, url):
+        try:
+            result = getUrl(url).result
+            url = re.compile('"m3u8_url":"(.+?)"').findall(result)[0]
+            result = getUrl(url).result
+            url = re.compile('(http://.+)').findall(result)[0]
             return url
         except:
             return

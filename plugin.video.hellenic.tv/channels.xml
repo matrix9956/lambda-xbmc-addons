@@ -37,8 +37,8 @@
 			<name>SKAI</name>
 			<type>skai</type>
 			<url>http://www.skai.gr/player/tvlive/</url>
-			<type></type>
-			<url>mmsh://magictvbox.us:200/skai</url>
+			<type2></type2>
+			<url2>mmsh://magictvbox.us:200/skai</url2>
 			<base>http://www.skai.gr</base>
 			<epg>30505</epg>
 		</channel>
@@ -180,8 +180,8 @@
 		</channel>
 		<channel active="True">
 			<name>LAMPSI TV</name>
-			<type></type>
-			<url>http://livestream-f.akamaihd.net/i/1044356_2098315_7adf5fc7_1@68991/index_524_av-p.m3u8</url>
+			<type>livestream_new</type>
+			<url>http://new.livestream.com/accounts/1044356/events/2098315</url>
 			<base>http://www.gamostv.eu/</base>
 			<epg>30547</epg>
 		</channel>

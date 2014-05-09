@@ -1013,6 +1013,7 @@ class pages:
 
                 url = common.parseDOM(page, "a", ret="href")[0]
                 url = proxy().redirect(url)
+                if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1050,6 +1051,7 @@ class genres:
 
                 url = common.parseDOM(genre, "a", ret="href")[0]
                 url = proxy().redirect(url)
+                if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1087,6 +1089,7 @@ class years:
 
                 url = common.parseDOM(year, "a", ret="href")[0]
                 url = proxy().redirect(url)
+                if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1124,6 +1127,7 @@ class countries:
 
                 url = common.parseDOM(country, "a", ret="href")[0]
                 url = proxy().redirect(url)
+                if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1161,6 +1165,7 @@ class languages:
 
                 url = common.parseDOM(language, "a", ret="href")[0]
                 url = proxy().redirect(url)
+                if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
                 url = common.replaceHTMLCodes(url)
                 url = url.encode('utf-8')
 
@@ -1177,8 +1182,8 @@ class movies:
         self.list = []
 
     def get(self, url):
-        #self.list = self.viooz_list(url)
-        self.list = cache(self.viooz_list, url)
+        self.list = self.viooz_list(url)
+        #self.list = cache(self.viooz_list, url)
         index().movieList(self.list)
         index().nextList(self.list)
 
@@ -1404,6 +1409,7 @@ class resolver:
         try:
             url = common.parseDOM(r, "source", ret="src", attrs = { "type": "video/.+?" })[0]
             url = proxy().redirect(url)
+            if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
             url = common.replaceHTMLCodes(url)
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')

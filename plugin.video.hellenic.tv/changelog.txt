@@ -1,4 +1,16 @@
 ------------------------
+Hellenic TV v2.6.5 (9-May-14)
+------------------------
+
+- Updated SKAI, MAD TV and LAMPSI TV.
+- Tweaked loading of channels.
+- Added livestream_new resolver.
+- Tweaked madtv resolver.
+- Tweaked skai resolver.
+- Code cosmetics.
+
+
+------------------------
 Hellenic TV v2.6.4 (7-May-14)
 ------------------------
 
