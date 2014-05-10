@@ -1182,8 +1182,8 @@ class movies:
         self.list = []
 
     def get(self, url):
-        self.list = self.viooz_list(url)
-        #self.list = cache(self.viooz_list, url)
+        #self.list = self.viooz_list(url)
+        self.list = cache(self.viooz_list, url)
         index().movieList(self.list)
         index().nextList(self.list)
 
@@ -1409,8 +1409,9 @@ class resolver:
         try:
             url = common.parseDOM(r, "source", ret="src", attrs = { "type": "video/.+?" })[0]
             url = proxy().redirect(url)
-            if not url.startswith('http://'): url = '%s%s' % (link().viooz_base, url)
-            url = common.replaceHTMLCodes(url)
+            url = url.split('/file/', 1)[-1]
+            url = os.path.splitext(url)[0]
+            url = base64.b64decode(urllib.unquote_plus(url))
             url = getUrl(url, output='geturl').result
             if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
             else: url = url.replace('https://', 'http://')
