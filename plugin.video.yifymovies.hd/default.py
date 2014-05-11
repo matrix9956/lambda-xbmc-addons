@@ -1510,17 +1510,23 @@ class resolver:
             else: url = url.replace('https://', 'http://')
             return url
         except:
+            pass
+
+        try:
             result = getUrl(referer).result
 
             imdb = re.findall('imdb.com/title/tt(\d+)', result, re.I)[0]
             name = common.parseDOM(result, "div", attrs = { "class": "namefilm" })[0]
             year = common.parseDOM(name, "a", attrs = { "rel": "tag" })[0]
             title = common.parseDOM(name, "h1")[0]
+            title = title.rsplit("Online", 1)[0]
             title = common.replaceHTMLCodes(title)
             title = title.strip()
 
             url = self.movie25(title, year, imdb)
             return url
+        except:
+            pass
 
     def movie25(self, title, year, imdb):
         hostDict = ['Firedrive', 'Putlocker', 'Sockshare', 'Played', 'Promptfile', 'Mightyupload', 'Gorillavid', 'Divxstage', 'Movreel', 'Bestreams', 'Flashx', 'Vidbull', 'Daclips', 'Movpod', 'Nosvideo', 'Novamov', 'Movshare', 'Vidx', 'Sharesix', 'Videoweed', 'Sharerepo', 'Uploadc', 'Filenuke']
