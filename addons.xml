@@ -150,7 +150,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.GOmovies" name="GOmovies" version="2.1.2" provider-name="lambda">
+<addon id="plugin.video.GOmovies" name="GOmovies" version="2.1.3" provider-name="lambda">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.metahandler" version="1.0.0"/>
@@ -170,6 +170,8 @@
 		<description lang="el">Παρακολουθήστε ταινίες από διάφορες πηγές</description>
 		<summary lang="fr">Regardez des films en version originale (Anglais)</summary>
 		<description lang="fr">Regardez des films en version originale (Anglais)</description>
+		<summary lang="he">צפו בסרטים ממקורות שונים</summary>
+		<description lang="he">צפו בסרטים ממקורות שונים</description>
 		<summary lang="nl">Bekijk Speelfilms van verscheidene bronnen</summary>
 		<description lang="nl">Bekijk Speelfilms van verscheidene bronnen</description>
 		<summary lang="pl">Oglądaj filmy z różnych źródeł</summary>
@@ -188,7 +190,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.GOtv" name="GOtv" version="2.1.0" provider-name="lambda">
+<addon id="plugin.video.GOtv" name="GOtv" version="2.1.3" provider-name="lambda">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
 		<import addon="script.module.metahandler" version="1.0.0"/>
@@ -209,6 +211,8 @@
 		<description lang="el">Παρακολουθήστε σειρές από διάφορες πηγές</description>
 		<summary lang="fr">Regardez des séries TV en version originale (Anglais)</summary>
 		<description lang="fr">Regardez des séries TV en version originale (Anglais)</description>
+		<summary lang="he">צפו בתכניות טלויזיה ממקורות שונים</summary>
+		<description lang="he">צפו בתכניות טלויזיה ממקורות שונים</description>
 		<summary lang="nl">Bekijk TV Series van verscheidene bronnen</summary>
 		<description lang="nl">Bekijk TV Series van verscheidene bronnen</description>
 		<summary lang="pl">Oglądaj seriale z różnych źródeł</summary>

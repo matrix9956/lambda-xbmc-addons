@@ -2208,6 +2208,11 @@ class resolver:
         if getSetting("icefilms") == 'true':
             threads.append(Thread(icefilms().get, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict))
 
+        global primewire_sources
+        primewire_sources = []
+        if getSetting("primewire") == 'true':
+            threads.append(Thread(primewire().get, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict))
+
         global watchseries_sources
         watchseries_sources = []
         threads.append(Thread(watchseries().get, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict))
@@ -2252,21 +2257,17 @@ class resolver:
         if getSetting("noobroom") == 'true':
             threads.append(Thread(noobroom().get, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict))
 
-        global merdb_sources
-        merdb_sources = []
-        if getSetting("merdb") == 'true':
-            threads.append(Thread(merdb().get, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict))
-
         [i.start() for i in threads]
         [i.join() for i in threads]
 
-        self.sources = icefilms_sources + watchseries_sources + tvonline_sources + ororotv_sources + putlockertv_sources + vkbox_sources + istreamhd_sources + simplymovies_sources + moviestorm_sources + noobroom_sources + merdb_sources
+        self.sources = icefilms_sources + watchseries_sources + primewire_sources + tvonline_sources + ororotv_sources + putlockertv_sources + vkbox_sources + istreamhd_sources + simplymovies_sources + moviestorm_sources + noobroom_sources
 
         return self.sources
 
     def sources_resolve(self, url, provider):
         try:
             if provider == 'Icefilms': url = icefilms().resolve(url)
+            elif provider == 'Primewire': url = primewire().resolve(url)
             elif provider == 'Watchseries': url = watchseries().resolve(url)
             elif provider == 'TVonline': url = tvonline().resolve(url)
             elif provider == 'OroroTV': url = ororotv().resolve(url)
@@ -2276,7 +2277,6 @@ class resolver:
             elif provider == 'Simplymovies': url = simplymovies().resolve(url)
             elif provider == 'Moviestorm': url = moviestorm().resolve(url)
             elif provider == 'Noobroom': url = noobroom().resolve(url)
-            elif provider == 'MerDB': url = merdb().resolve(url)
             return url
         except:
             return
@@ -2494,11 +2494,100 @@ class icefilms:
         except:
             return
 
+class primewire:
+    def __init__(self):
+        self.base_link = 'http://www.primewire.ag'
+        self.key_link = 'http://www.primewire.ag/index.php?search'
+        self.search_link = 'http://www.primewire.ag/index.php?search_keywords=%s&key=%s&search_section=2'
+        self.proxy_base_link = 'http://9proxy.in'
+        self.proxy_link = 'http://9proxy.in/b.php?u=%s&b=12'
+
+    def get(self, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict):
+        try:
+            global primewire_sources
+            primewire_sources = []
+
+            try:
+                result = getUrl(self.key_link).result
+                key = common.parseDOM(result, "input", ret="value", attrs = { "name": "key" })[0]
+                query = self.search_link % (urllib.quote_plus(re.sub('\'', '', show)), key)
+            except:
+                result = getUrl(self.proxy_link % urllib.quote_plus(urllib.unquote_plus(self.key_link)), referer=self.proxy_base_link).result
+                key = common.parseDOM(result, "input", ret="value", attrs = { "name": "key" })[0]
+                query = self.search_link % (urllib.quote_plus(re.sub('\'', '', show)), key)
+                query = self.proxy_link % urllib.quote_plus(urllib.unquote_plus(query))
+
+            result = getUrl(query, referer=query).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            result = common.parseDOM(result, "div", attrs = { "class": "index_item.+?" })
+
+            match = [i for i in result if any(x == self.cleantitle(re.compile('title="Watch (.+?)[(]\d{4}[)]"').findall(i)[0].strip()) for x in [self.cleantitle(show), self.cleantitle(show_alt)])]
+            match2 = [i for i in match if any(x in re.compile('title="Watch (.+?)"').findall(i)[0] for x in ['(%s)' % str(year), '(%s)' % str(int(year)+1), '(%s)' % str(int(year)-1)])][0]
+            url = common.parseDOM(match2, "a", ret="href")[0]
+            if url.startswith('/b.php?u='):
+                url = url.replace('%2Fwatch-','%2Ftv-')
+                url = url.replace('&amp;b=', '%2F' + 'season-%01d-episode-%01d&b=' % (int(season), int(episode)))
+                url = '%s%s' % (self.proxy_base_link, url)
+            else:
+                url = url.replace('/watch-','/tv-')
+                url += '/season-%01d-episode-%01d' % (int(season), int(episode))
+                url = '%s%s' % (self.base_link, url)
+            url = common.replaceHTMLCodes(url)
+            url = url.encode('utf-8')
+
+            result = getUrl(url, referer=url).result
+            result = result.decode('iso-8859-1').encode('utf-8')
+            links = common.parseDOM(result, "tbody")
+
+            for i in links:
+                try:
+                    host = common.parseDOM(i, "a", ret="href", attrs = { "class": ".+?rater" })[0]
+                    host = urllib.unquote_plus(host.split('/b.php?u=', 1)[-1].split('&amp;', 1)[0])
+                    host = re.compile('domain=(.+?)[.]').findall(host)[0]
+                    host = [x for x in hostDict if host.lower() == x.lower()][0]
+                    host = host.encode('utf-8')
+
+                    quality = common.parseDOM(i, "span", ret="class")[0]
+                    if quality == 'quality_dvd': quality = 'SD'
+                    else:  raise Exception()
+                    quality = quality.encode('utf-8')
+
+                    url = common.parseDOM(i, "a", ret="href")[0]
+                    if url.startswith('/b.php?u='): url = '%s%s' % (self.proxy_base_link, url)
+                    else: url = '%s%s' % (self.base_link, url)
+                    url = common.replaceHTMLCodes(url)
+                    url = url.encode('utf-8')
+
+                    primewire_sources.append({'source': host, 'quality': quality, 'provider': 'Primewire', 'url': url})
+                except:
+                    pass
+        except:
+            return
+
+    def cleantitle(self, title):
+        title = re.sub('\n|\s(|[(])(UK|US|AU)(|[)])$|\s(vs|v[.])\s|(:|;|-|"|,|\'|\.|\?)|\s', '', title).lower()
+        return title
+
+    def resolve(self, url):
+        try:
+            result = getUrl(url, referer=url).result
+            url = common.parseDOM(result, "noframes")[0]
+            url = common.replaceHTMLCodes(url)
+            url = url.encode('utf-8')
+
+            import urlresolver
+            host = urlresolver.HostedMediaFile(url)
+            if host: resolver = urlresolver.resolve(url)
+            if not resolver.startswith('http://'): return
+            if not resolver == url: return resolver
+        except:
+            return
+
 class watchseries:
     def __init__(self):
-        self.base_link = 'http://watchseries.lt'
-        self.search_link = 'http://watchseries.lt/search/%s'
-        self.episode_link = 'http://watchseries.lt/episode/%s_s%s_e%s.html'
+        self.base_link = 'http://watchseries.ag'
+        self.search_link = 'http://watchseries.ag/search/%s'
+        self.episode_link = 'http://watchseries.ag/episode/%s_s%s_e%s.html'
 
     def get(self, name, title, imdb, tvdb, year, season, episode, show, show_alt, hostDict):
         try:
@@ -2508,6 +2597,7 @@ class watchseries:
             query = self.search_link % urllib.quote_plus(show)
 
             result = getUrl(query).result
+            result = result.decode('iso-8859-1').encode('utf-8')
             result = result.replace(' (%s)' % str(int(year) - 1), ' (%s)' % year)
             result = re.compile('href="(/serie/.+?)".+?[(]%s[)]' % year).findall(result)
             result = uniqueList(result).list
@@ -2524,12 +2614,15 @@ class watchseries:
                         break
                 except:
                     pass
+
             url = match2.rsplit('/', 1)[-1]
             url = self.episode_link % (url, season, episode)
             url = common.replaceHTMLCodes(url)
             url = url.encode('utf-8')
 
             result = getUrl(url).result
+            result = common.parseDOM(result, "div", attrs = { "id": "lang_1" })[0]
+
             for host in hostDict:
                 try:
                     links = re.compile('<span>%s</span>.+?href="(.+?)"' % host.lower()).findall(result)

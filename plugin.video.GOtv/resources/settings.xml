@@ -47,6 +47,7 @@
 
 	<category label="30060">
 		<setting id="icefilms" type="bool" label="Icefilms" default="true"/>
+		<setting id="primewire" type="bool" label="Primewire" default="true"/>
 		<setting id="watchseries" type="bool" label="Watchseries" default="true"/>
 		<setting id="tvonline" type="bool" label="TVonline" default="true"/>
 		<setting id="ororotv" type="bool" label="OroroTV" default="true"/>
@@ -56,7 +57,6 @@
 		<setting id="simplymovies" type="bool" label="Simplymovies" default="true"/>
 		<setting id="moviestorm" type="bool" label="Moviestorm" default="true"/>
 		<setting id="noobroom" type="bool" label="Noobroom" default="false"/>
-		<setting id="merdb" type="bool" label="MerDB" default="true"/>
 	</category>
 
 	<category label="30080">

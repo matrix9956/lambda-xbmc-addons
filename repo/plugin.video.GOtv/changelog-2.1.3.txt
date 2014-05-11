@@ -1,4 +1,15 @@
 ------------------------
+GOtv v2.1.3 (11-May-14)
+------------------------
+
+- Added Primewire source.
+- Fixed Watchseries source.
+- Removed MerDB source.
+- Added Hebrew translation.
+- Code cosmetics.
+
+
+------------------------
 GOtv v2.1.0 (4-May-14)
 ------------------------
 
